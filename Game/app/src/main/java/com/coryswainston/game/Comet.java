@@ -3,13 +3,15 @@ package com.coryswainston.game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 
 /**
+ * For killin llamas
+ *
  * @author Cory Swainston
  */
 
-public class Llama {
-
+public class Comet {
     private Bitmap bitmap;
     private int x;
     private int y;
@@ -17,13 +19,11 @@ public class Llama {
     private int dy;
     private int yFloor;
 
-    private final int GRAVITY = 5;
-
-    public Llama(Context context){
-        x = 0;
+    public Comet(Context context, int x){
+        this.x = x;
         y = 0;
-        dx = 1;
-        dy = 0;
+        dy = 40;
+        dx = 0;
 
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama1);
     }
@@ -31,20 +31,6 @@ public class Llama {
     public void update(){
         x += dx;
         y += dy;
-        if (y < yFloor){
-            dy += GRAVITY;
-        }
-        if (y < (yFloor - 400) && dy < 0){
-            dy = -dy;
-        }
-        if (y >= yFloor){
-            y = yFloor;
-            dy = 0;
-        }
-    }
-
-    public void jump() {
-        setDy(50);
     }
 
     public Bitmap getBitmap(){
@@ -73,7 +59,7 @@ public class Llama {
         return dy;
     }
 
-    public void setDy(int dy) { this.dy = -dy; }
+    public void setDy(int dy) { this.dy = dy; }
 
     public void setFloor(int yFloor){this.yFloor = yFloor;}
 }
