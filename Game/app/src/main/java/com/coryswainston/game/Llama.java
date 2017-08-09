@@ -10,12 +10,13 @@ import android.graphics.BitmapFactory;
 
 public class Llama {
 
-    private Bitmap bitmap;
+    private Bitmap[] bitmaps;
     private int x;
     private int y;
     private int dx;
     private int dy;
     private int yFloor;
+    private int bitmapIdx;
 
     private final int GRAVITY = 5;
 
@@ -25,10 +26,18 @@ public class Llama {
         dx = 1;
         dy = 0;
 
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama1);
+        bitmapIdx = 0;
+        bitmaps = new Bitmap[2];
+        bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama1);
+        bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama2);
     }
 
     public void update(){
+        if (dx > 0) {
+            bitmapIdx = 0;
+        } else if (dx < 0) {
+            bitmapIdx = 1;
+        }
         x += dx;
         y += dy;
         if (y < yFloor){
@@ -48,7 +57,7 @@ public class Llama {
     }
 
     public Bitmap getBitmap(){
-        return bitmap;
+        return bitmaps[bitmapIdx];
     }
 
     public int getX() {

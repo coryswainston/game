@@ -1,20 +1,35 @@
 package com.coryswainston.game;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String HANKEN_BOOK_FONT = "Hanken-Book.ttf";
+
+    private MenuView menuView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        menuView = new MenuView(this);
+        setContentView(menuView);
     }
 
-    public void playGame(View view){
-        Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
+    @Override
+    protected void onPause(){
+        super.onPause();
+         menuView.pause();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        menuView.resume();
     }
 }
