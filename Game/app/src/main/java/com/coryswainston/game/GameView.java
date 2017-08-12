@@ -57,7 +57,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float[] initialValues;
 
     private final long TARGET_MILLIS = 33;
-    private final int INITIAL_FREQUENCY = 37;
+    private final int INITIAL_FREQUENCY = 50;
 
     /**
      * Constructor, initializes everything for the game
@@ -71,13 +71,16 @@ public class GameView extends SurfaceView implements Runnable {
         // get the coordinates of the bottom and right of the screen
         bounds = new Point();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(bounds);
-        yFloor = bounds.y - 200;
+        yFloor = bounds.y - bounds.y / 7;
 
         // make a llama
         llama = new Llama(context);
+        llama.setSize(bounds.y / 6, bounds.y / 6);
         llama.setX(10);
-        llama.setY(yFloor - llama.getBitmap().getHeight() + 10);
+        llama.setY(yFloor - llama.getBitmap().getHeight());
         llama.setFloor(llama.getY());
+        llama.setCeiling(bounds.y / 4);
+
 
         //set up comet array
         comets = new ArrayList<>();
@@ -150,8 +153,8 @@ public class GameView extends SurfaceView implements Runnable {
                 } else if (Math.abs(xDiff) > THRESHOLD) {
                     // if we swipe left or right the llama accelerates
                     Log.d(">", "x threshold passed");
-                    llama.addDx(xDiff > 0 ? 10 : -10);
-                } else if (yDiff > 0){
+                    llama.addDx(xDiff > 0 ? 20 : -20);
+                } else if (yDiff < 0){
                     // if we swipe up, the llama jumps
                     Log.d(">", "y threshold passed");
                     llama.jump();
@@ -176,14 +179,15 @@ public class GameView extends SurfaceView implements Runnable {
         Comet newComet = null;
         Random random = new Random();
         if (random.nextInt(cometFrequency) == 1){
-            newComet = new Comet(getContext(), random.nextInt(bounds.x - Comet.COMET_WIDTH));
+            newComet = new Comet(getContext(), random.nextInt(bounds.x));
         }
         if (newComet != null){
+            newComet.setSize(bounds.y /10, bounds.y / 7);
             comets.add(newComet);
         }
         for (Iterator<Comet> it = comets.iterator(); it.hasNext();){
             Comet comet = it.next();
-            if (comet.getY() >= bounds.y - Comet.COMET_HEIGHT - 200){
+            if (comet.getY() >= yFloor - comet.getHeight()){
                 comet.explode();
             }
             if (!comet.alive){
@@ -194,10 +198,11 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void detectCollisions(){
-        final int THRESHOLD = 200;
+        Point llamaCenter = new Point(llama.getX() + llama.getWidth() / 2, llama.getY() + llama.getHeight() / 2);
         for(Comet comet : comets){
-            if (Math.abs(comet.getX() - llama.getX()) < THRESHOLD &&
-                    Math.abs(comet.getY() - llama.getY()) < THRESHOLD){
+            Point cometCenter = new Point(comet.getX() + comet.getWidth() / 2, comet.getY() + comet.getHeight());
+            if (Math.abs(cometCenter.x - llamaCenter.x) < llama.getWidth() / 2 + comet.getWidth() / 2 &&
+                    Math.abs(cometCenter.y - llamaCenter.y) < llama.getHeight()){
                 comet.explode();
                 playing = false;
             }
@@ -209,6 +214,9 @@ public class GameView extends SurfaceView implements Runnable {
      */
     private void draw(){
         if(surfaceHolder.getSurface().isValid()) {
+            Typeface normal = Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT);
+            Typeface bold = Typeface.create(normal, Typeface.BOLD);
+            paint.setTypeface(normal);
             canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.rgb(180, 230, 255));
 
@@ -219,9 +227,16 @@ public class GameView extends SurfaceView implements Runnable {
             // draw llama and comets
             Bitmap llamaBitmap = llama.getBitmap();
             canvas.drawBitmap(llama.getBitmap(), llama.getX(), llama.getY(), paint);
+            canvas.drawRect(llama.getX(), llama.getY(), llama.getX() + 10, llama.getY() + 10, paint);
             for (Comet comet : comets) {
                 canvas.drawBitmap(comet.getBitmap(), comet.getX(), comet.getY(), paint);
             }
+
+            // draw score at the top
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(bounds.y / 20);
+            paint.setTypeface(bold);
+            canvas.drawText("POINTS: 0", 40, 70, paint);
 
             if (!playing){
                 canvas.drawColor(Color.argb(150, 255, 255, 255));
@@ -230,8 +245,6 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setTextAlign(Paint.Align.CENTER);
                 paint.setStyle(Paint.Style.FILL);
                 paint.setFakeBoldText(true);
-                Typeface typeface = Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT);
-                paint.setTypeface(typeface);
                 canvas.drawText("GAME OVER", bounds.x / 2, bounds.y / 2, paint);
                 paint.setTextSize(80);
                 paint.setColor(Color.BLUE);

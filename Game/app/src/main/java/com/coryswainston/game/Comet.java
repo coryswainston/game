@@ -10,18 +10,10 @@ import android.graphics.BitmapFactory;
  * @author Cory Swainston
  */
 
-public class Comet {
-    private Bitmap[] bitmaps;
-    private int x;
-    private int y;
-    private int dx;
-    private int dy;
-    private int frameCtr;
-    private int bitmapIdx;
-    public boolean alive;
+public class Comet extends Sprite{
 
-    public static final int COMET_WIDTH = 60;
-    public static final int COMET_HEIGHT = 90;
+    private int frameCtr;
+    public boolean alive;
 
     public Comet(Context context, int x){
         this.x = x;
@@ -35,6 +27,8 @@ public class Comet {
         bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet1);
         bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet2);
         bitmaps[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet2);
+        width = 60;
+        height = 90;
     }
 
     public void update(){
