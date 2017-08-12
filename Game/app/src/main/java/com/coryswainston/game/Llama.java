@@ -16,6 +16,7 @@ public class Llama {
     private int dx;
     private int dy;
     private int yFloor;
+    private int yCeiling;
     private int bitmapIdx;
 
     private final int GRAVITY = 5;
@@ -23,9 +24,9 @@ public class Llama {
     public Llama(Context context){
         x = 0;
         y = 0;
-        dx = 1;
+        dx = 0;
         dy = 0;
-
+        yCeiling = 400;
         bitmapIdx = 0;
         bitmaps = new Bitmap[2];
         bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama1);
@@ -34,16 +35,16 @@ public class Llama {
 
     public void update(){
         if (dx > 0) {
-            bitmapIdx = 0;
+            turnLeft();
         } else if (dx < 0) {
-            bitmapIdx = 1;
+            turnRight();
         }
         x += dx;
         y += dy;
         if (y < yFloor){
             dy += GRAVITY;
         }
-        if (y < (yFloor - 400) && dy < 0){
+        if (y < (yFloor - yCeiling) && dy < 0){
             dy = -dy;
         }
         if (y >= yFloor){
@@ -53,7 +54,7 @@ public class Llama {
     }
 
     public void jump() {
-        setDy(50);
+        setDy(60);
     }
 
     public Bitmap getBitmap(){
@@ -84,5 +85,13 @@ public class Llama {
 
     public void setDy(int dy) { this.dy = -dy; }
 
+    public void addDx(int ddx) {dx += ddx;}
+
+    public void addDy(int ddy) {dy += ddy; }
+
     public void setFloor(int yFloor){this.yFloor = yFloor;}
+
+    public void turnLeft(){ bitmapIdx = 1; }
+
+    public void turnRight() { bitmapIdx = 0; }
 }

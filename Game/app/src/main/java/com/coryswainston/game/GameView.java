@@ -47,6 +47,7 @@ public class GameView extends SurfaceView implements Runnable {
     private SurfaceHolder surfaceHolder;
     private Canvas canvas;
     private Point bounds;
+    private int yFloor;
     private Context context;
 
     private Llama llama;
@@ -56,6 +57,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float[] initialValues;
 
     private final long TARGET_MILLIS = 33;
+    private final int INITIAL_FREQUENCY = 37;
 
     /**
      * Constructor, initializes everything for the game
@@ -69,16 +71,17 @@ public class GameView extends SurfaceView implements Runnable {
         // get the coordinates of the bottom and right of the screen
         bounds = new Point();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(bounds);
+        yFloor = bounds.y - 200;
 
         // make a llama
         llama = new Llama(context);
         llama.setX(10);
-        llama.setY(bounds.y - 190 - llama.getBitmap().getHeight());
+        llama.setY(yFloor - llama.getBitmap().getHeight() + 10);
         llama.setFloor(llama.getY());
 
         //set up comet array
         comets = new ArrayList<>();
-        cometFrequency = 50;
+        cometFrequency = INITIAL_FREQUENCY;
 
         // set everything up for drawing
         surfaceHolder = getHolder();
@@ -117,7 +120,11 @@ public class GameView extends SurfaceView implements Runnable {
 
         switch (e.getActionMasked()){
             case MotionEvent.ACTION_DOWN: // when finger hits the screen
-                llama.setDx(e.getX() > llama.getX() ? 10 : -10);
+                if (e.getX() <= llama.getX()){
+                    llama.turnLeft();
+                } else {
+                    llama.turnRight();
+                }
 
                 initialValues[0] = e.getX();
                 initialValues[1] = e.getY();
@@ -143,11 +150,13 @@ public class GameView extends SurfaceView implements Runnable {
                 } else if (Math.abs(xDiff) > THRESHOLD) {
                     // if we swipe left or right the llama accelerates
                     Log.d(">", "x threshold passed");
-                    llama.setDx(xDiff > 0 ? 30 : -30);
-                } else {
+                    llama.addDx(xDiff > 0 ? 10 : -10);
+                } else if (yDiff > 0){
                     // if we swipe up, the llama jumps
                     Log.d(">", "y threshold passed");
                     llama.jump();
+                } else {
+
                 }
         }
 
@@ -205,13 +214,10 @@ public class GameView extends SurfaceView implements Runnable {
 
             // draw the ground
             paint.setColor(Color.rgb(0, 100, 0));
-            canvas.drawRect(0, bounds.y - 200, bounds.x, bounds.y, paint);
+            canvas.drawRect(0, yFloor, bounds.x, bounds.y, paint);
 
             // draw llama and comets
             Bitmap llamaBitmap = llama.getBitmap();
-            if (llama.getDx() < 0){
-
-            }
             canvas.drawBitmap(llama.getBitmap(), llama.getX(), llama.getY(), paint);
             for (Comet comet : comets) {
                 canvas.drawBitmap(comet.getBitmap(), comet.getX(), comet.getY(), paint);
