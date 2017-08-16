@@ -12,6 +12,8 @@ public class Llama extends Sprite{
 
     private int yFloor;
     private int yCeiling;
+    private boolean ducking;
+    private int duckTimer;
 
     private final int GRAVITY = 5;
 
@@ -20,6 +22,7 @@ public class Llama extends Sprite{
         y = 0;
         dx = 0;
         dy = 0;
+        alive = true;
         yCeiling = 400;
         bitmapIdx = 0;
         bitmaps = new Bitmap[2];
@@ -27,6 +30,7 @@ public class Llama extends Sprite{
         bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama2);
         height = bitmaps[0].getHeight();
         width = bitmaps[1].getWidth();
+        duckTimer = 0;
     }
 
     public void update(){
@@ -43,12 +47,21 @@ public class Llama extends Sprite{
             y = yFloor;
             dy = 0;
         }
+        if (duckTimer > 0){
+            duckTimer--;
+        } else {
+            ducking = false;
+        }
     }
 
     public void jump() {
-        setDy(-yCeiling / 6);
+        setDy((int)(-yCeiling / 6.5));
     }
 
+    public void duck() {
+        ducking = true;
+        duckTimer = 8;
+    }
 
     public void setFloor(int yFloor){ this.yFloor = yFloor; }
 
@@ -57,5 +70,7 @@ public class Llama extends Sprite{
     public void turnLeft(){ bitmapIdx = 1; }
 
     public void turnRight() { bitmapIdx = 0; }
+
+    public boolean isDucking(){return ducking;}
 
 }

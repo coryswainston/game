@@ -9,13 +9,14 @@ import android.graphics.Bitmap;
 public abstract class Sprite {
 
     protected Bitmap[] bitmaps;
-    protected int x;
-    protected int y;
-    protected int dx;
-    protected int dy;
+    protected float x;
+    protected float y;
+    protected float dx;
+    protected float dy;
     protected int bitmapIdx;
     protected int height;
     protected int width;
+    protected boolean alive;
 
     public abstract void update();
 
@@ -24,32 +25,32 @@ public abstract class Sprite {
     }
 
     public int getX() {
-        return x;
+        return (int)x;
     }
 
-    public void setX(int x) { this.x = x; }
+    public void setX(float x) { this.x = x; }
 
     public int getY() {
-        return y;
+        return (int)y;
     }
 
-    public void setY(int y) { this.y = y; }
+    public void setY(float y) { this.y = y; }
 
-    public int getDx() {
+    public float getDx() {
         return dx;
     }
 
-    public void setDx(int dx) { this.dx = dx; }
+    public void setDx(float dx) { this.dx = dx; }
 
-    public int getDy() {
+    public float getDy() {
         return dy;
     }
 
-    public void setDy(int dy) { this.dy = dy; }
+    public void setDy(float dy) { this.dy = dy; }
 
-    public void addDx(int ddx) { dx += ddx; }
+    public void addDx(float ddx) { dx += ddx; }
 
-    public void addDy(int ddy) { dy += ddy; }
+    public void addDy(float ddy) { dy += ddy; }
 
     public void setSize(int width, int height) {
         for (int i = 0; i < bitmaps.length; i++){
@@ -62,4 +63,8 @@ public abstract class Sprite {
     public int getWidth(){return width;}
 
     public int getHeight(){return height;}
+
+    public void kill(){alive = false;}
+
+    public boolean isAlive(){return alive;}
 }

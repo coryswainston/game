@@ -13,20 +13,21 @@ import android.graphics.BitmapFactory;
 public class Comet extends Sprite{
 
     private int frameCtr;
-    public boolean alive;
+    private boolean exploded;
 
     public Comet(Context context, int x){
         this.x = x;
         y = 0;
-        dy = 30;
+        dy = 20;
         dx = (int)(Math.random() * 20) - 10;
         frameCtr = 0;
         alive = true;
+        exploded = false;
 
         bitmaps = new Bitmap[3];
         bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet1);
         bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet2);
-        bitmaps[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet2);
+        bitmaps[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet3);
         width = 60;
         height = 90;
     }
@@ -41,34 +42,6 @@ public class Comet extends Sprite{
         }
     }
 
-    public Bitmap getBitmap(){
-        return bitmaps[bitmapIdx];
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) { this.x = x; }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) { this.y = y; }
-
-    public int getDx() {
-        return dx;
-    }
-
-    public void setDx(int dx) { this.dx = dx; }
-
-    public int getDy() {
-        return dy;
-    }
-
-    public void setDy(int dy) { this.dy = dy; }
-
     private void toggleBitmap(){
         if (bitmapIdx == 2){
             alive = false;
@@ -79,6 +52,13 @@ public class Comet extends Sprite{
 
     public void explode(){
         bitmapIdx = 2;
+        frameCtr = 0;
+        exploded = true;
         dy = 0;
+        dx = 0;
+    }
+
+    public boolean isExploded(){
+        return exploded;
     }
 }

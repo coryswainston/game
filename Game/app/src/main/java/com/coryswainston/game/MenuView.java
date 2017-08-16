@@ -38,18 +38,20 @@ public class MenuView extends SurfaceView implements Runnable{
             ((Activity)context).getWindowManager().getDefaultDisplay().getSize(bounds);
 
             Llama llama = new Llama(context);
+            llama.setSize(bounds.x / 6, bounds.x / 6);
             llama.setY(bounds.y / 4);
             llama.setX(bounds.x / 2);
 
-            canvas.drawColor(Color.rgb(50, 120, 235));
+            canvas.drawColor(Color.WHITE);
             canvas.drawBitmap(llama.getBitmap(), llama.getX(), llama.getY(), paint);
-            paint.setColor(Color.YELLOW);
+            paint.setColor(Color.BLUE);
             paint.setTextSize(300);
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setTypeface(Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT));
             canvas.drawText("LLAMA", bounds.x /2, bounds.y / 2, paint);
-            canvas.drawText("LAND", bounds.x / 2, bounds.y / 2 + 350, paint);
+            canvas.drawText("LLAND", bounds.x / 2, bounds.y / 2 + 350, paint);
             paint.setTextSize(80);
+            paint.setColor(Color.rgb(0, 100, 0));
             canvas.drawText("Tap to play", bounds.x / 2, bounds.y /2 + 680, paint);
 
             surfaceHolder.unlockCanvasAndPost(canvas);
