@@ -1,40 +1,32 @@
-package com.coryswainston.game;
+package com.coryswainston.game.views;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.os.Build;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.constraint.solver.SolverVariable;
 import android.util.Log;
-import android.view.Display;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import junit.framework.Assert;
+import com.coryswainston.game.activities.MainActivity;
+import com.coryswainston.game.helpers.DrawingHelper;
+import com.coryswainston.game.helpers.GestureHelper;
+import com.coryswainston.game.objects.Sheep;
+import com.coryswainston.game.objects.Cloud;
+import com.coryswainston.game.objects.Comet;
+import com.coryswainston.game.objects.Llama;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -45,33 +37,34 @@ import java.util.Random;
 
 public class GameView extends SurfaceView implements Runnable {
 
-    volatile boolean playing;
-    private Thread gameThread = null;
-    private Paint paint;
-    private SurfaceHolder surfaceHolder;
-    private Canvas canvas;
-    private Point bounds;
-    private int yFloor;
-    private Context context;
-    private SoundPool soundPool;
-    private SharedPreferences sharedPreferences;
+    private final long TARGET_MILLIS = 33;
+    private final int INITIAL_FREQUENCY = 50;
     private final String HIGH_SCORE = "high_score";
     private final String LLAMA_PREFS = "llama_prefs";
 
+    volatile boolean playing = true;
+    private Thread gameThread = null;
+    private SurfaceHolder surfaceHolder = getHolder();
+    GestureHelper gestureHelper = new GestureHelper();
+    private Point bounds;
+    private int yFloor;
+
+    private Context context;
+    private SoundPool soundPool;
+    private SharedPreferences sharedPreferences;
+
     private Llama llama;
-    private ArrayList<Comet> comets;
-    private ArrayList<Sheep> sheeps;
+    private List<Comet> comets = new ArrayList<>();
+    private List<Sheep> sheeps = new ArrayList<>();
     private Cloud[] clouds;
-    int points;
+    private int cometFrequency = INITIAL_FREQUENCY;
+    private int sheepFrequency = INITIAL_FREQUENCY * 2;
+
+    int points = 0;
     int highScore;
     boolean newHigh;
 
-    private int cometFrequency;
-    private int sheepFrequency;
-    private float[] initialValues;
-
-    private final long TARGET_MILLIS = 33;
-    private final int INITIAL_FREQUENCY = 50;
+    private int gatheredSheep;
 
     /**
      * Constructor, initializes everything for the game
@@ -82,32 +75,28 @@ public class GameView extends SurfaceView implements Runnable {
         super(context);
         this.context = context;
 
-        // get the coordinates of the bottom and right of the screen
+        setUpBoundaries();
+        createLlama();
+        setUpClouds();
+        getHighScore();
+    }
+
+    private void createLlama() {
+        llama = new Llama(context, bounds.y / 6, bounds.y / 6);
+        llama.setX(10);
+        llama.setY(yFloor - llama.getHeight());
+        llama.setFloor(llama.getY());
+        llama.setCeiling(bounds.y / 5);
+    }
+
+    private void setUpBoundaries() {
         bounds = new Point();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(bounds);
         yFloor = bounds.y - bounds.y / 7;
-
-        // make a llama
-        llama = new Llama(context);
-        llama.setSize(bounds.y / 6, bounds.y / 6);
-        llama.setX(10);
-        llama.setY(yFloor - llama.getBitmap().getHeight());
-        llama.setFloor(llama.getY());
-        llama.setCeiling(bounds.y / 5);
-
-
-        //set up comet array
-        comets = new ArrayList<>();
-        cometFrequency = INITIAL_FREQUENCY;
-
-        // set up sheep array
-        sheeps = new ArrayList<>();
-        sheepFrequency = INITIAL_FREQUENCY * 2;
-
-        // set everything up for drawing
-        surfaceHolder = getHolder();
         surfaceHolder.setFixedSize(bounds.x, bounds.y);
-        paint = new Paint();
+    }
+
+    private void setUpClouds() {
         clouds = new Cloud[3];
         for(int i = 0; i < 3; i++){
             Cloud cloud = new Cloud(context);
@@ -121,24 +110,9 @@ public class GameView extends SurfaceView implements Runnable {
         clouds[0].setY(bounds.y / 2);
         clouds[1].setY(bounds.y / 4);
         clouds[2].setY(0);
+    }
 
-        // set up soundPool
-        if (Build.VERSION.SDK_INT >= 21){
-            AudioAttributes audio = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_GAME)
-                    .build();
-            SoundPool.Builder builder = new SoundPool.Builder();
-            builder.setAudioAttributes(audio).setMaxStreams(10);
-            soundPool = builder.build();
-        } else {
-            soundPool = new SoundPool(AudioManager.STREAM_MUSIC, 10, 1);
-        }
-
-        // initialize other members
-        playing = true;
-        initialValues = new float[2];
-        points = 0;
+    private void getHighScore() {
         sharedPreferences = context.getSharedPreferences(LLAMA_PREFS, 0);
         highScore = sharedPreferences.getInt(HIGH_SCORE, 0);
         newHigh = false;
@@ -167,14 +141,17 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent e){
 
-        // the amount of movement to register a swipe
-        final int THRESHOLD = 200;
-
         switch (e.getActionMasked()){
             case MotionEvent.ACTION_DOWN: // when finger hits the screen
-                initialValues[0] = e.getX();
-                initialValues[1] = e.getY();
-
+                if (gestureHelper.isFirstTouch()) {
+                    gestureHelper.registerTouch(e);
+                    return true;
+                }
+                if (gestureHelper.isSwipeDown(e)){
+                    llama.duck();
+                } else {
+                    llama.release();
+                }
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
                 if(!playing){
@@ -182,36 +159,23 @@ public class GameView extends SurfaceView implements Runnable {
                     context.startActivity(intent);
                 }
 
-                float endX = e.getX();
-                float endY = e.getY();
+                gestureHelper.release(e);
 
-                float xDiff = endX - initialValues[0];
-                float yDiff = endY - initialValues[1];
-                Log.d("ACTION UP", "xDiff = " + xDiff + ", yDiff = " + yDiff);
-
-                if (Math.abs(xDiff) < THRESHOLD && Math.abs(yDiff) < THRESHOLD) {
-                    // if we haven't swiped, the llama stops
+                if (gestureHelper.noSwipe()) {
                     llama.setDx(0);
-                    Log.d(">", "Didn't pass threshold");
-                } else if (Math.abs(xDiff) > THRESHOLD) {
-                    // if we swipe left or right the llama accelerates
-                    Log.d(">", "x threshold passed");
-                    if (xDiff > 0){
-                        llama.turnRight();
-                        llama.setDx(30);
-                    } else {
-                        llama.turnLeft();
-                        llama.setDx(-30);
-                    }
-                } else if (yDiff < 0){
-                    // if we swipe up, the llama jumps
-                    Log.d(">", "y threshold passed");
+                } else if (gestureHelper.isRightSwipe()){
+                    llama.turnRight();
+                    llama.setDx(30);
+                } else if (gestureHelper.isLeftSwipe()) {
+                    llama.turnLeft();
+                    llama.setDx(-30);
+                } else if (gestureHelper.isSwipeUp()){
                     llama.jump();
                 } else {
-                    llama.duck();
+                    llama.release();
                 }
+                return true;
         }
-
         return super.onTouchEvent(e);
     }
 
@@ -225,7 +189,10 @@ public class GameView extends SurfaceView implements Runnable {
         updateClouds();
         updateSheep();
         checkBounds();
+        updateHighScore();
+    }
 
+    private void updateHighScore() {
         if (!playing && points > highScore){
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(HIGH_SCORE, points);
@@ -283,7 +250,7 @@ public class GameView extends SurfaceView implements Runnable {
                 comet.explode();
             }
             comet.update();
-            if (!comet.alive){
+            if (!comet.isAlive()){
                 it.remove();
                 points += 10;
             }
@@ -303,10 +270,10 @@ public class GameView extends SurfaceView implements Runnable {
         }
         for(Sheep sheep : sheeps){
             Point sheepCenter = new Point(sheep.getX() + sheep.getWidth() / 2, sheep.getY());
-            if (Math.abs(llamaCenter.x - sheepCenter.x) < 100) {
+            if (Math.abs(llamaCenter.x - sheepCenter.x) < 100 && llama.isDucking()) {
                 sheep.setX(llama.getX());
-                sheep.setY(llama.getY() + sheep.getHeight() - llamaCenter.y);
-
+                sheep.setY(llama.getY() - sheep.getHeight() / 2 - sheep.getHeight() * gatheredSheep);
+                gatheredSheep++;
             }
         }
     }
@@ -330,58 +297,46 @@ public class GameView extends SurfaceView implements Runnable {
      * You know what this one does
      */
     private void draw(){
-        if(surfaceHolder.getSurface().isValid()) {
-            Typeface normal = Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT);
-            Typeface bold = Typeface.create(normal, Typeface.BOLD);
-            paint.setTypeface(normal);
-            canvas = surfaceHolder.lockCanvas();
-            canvas.drawColor(Color.rgb(180, 230, 255));
+        if(readyToDraw()) {
+            DrawingHelper drawingHelper = new DrawingHelper(context, surfaceHolder);
 
-            // draw the ground and clouds
-            for (int i = 0; i < 3; i++){
-                canvas.drawBitmap(clouds[i].getBitmap(), clouds[i].getX(), clouds[i].getY(), paint);
+            drawingHelper.fillBackground(Color.rgb(180, 230, 255));
+
+            for (Cloud cloud : clouds){
+                drawingHelper.draw(cloud);
             }
-            paint.setColor(Color.rgb(0, 100, 0));
-            canvas.drawRect(0, yFloor, bounds.x, bounds.y, paint);
-
-            // draw llama and comets
-            Bitmap llamaBitmap = llama.getBitmap();
-            canvas.drawBitmap(llama.getBitmap(), llama.getX(), llama.getY(), paint);
+            drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, Color.rgb(0, 100, 0)); // the ground
+            drawingHelper.draw(llama);
             for (Comet comet : comets) {
-                canvas.drawBitmap(comet.getBitmap(), comet.getX(), comet.getY(), paint);
+                drawingHelper.draw(comet);
             }
             for (Sheep sheep : sheeps){
-                canvas.drawBitmap(sheep.getBitmap(), sheep.getX(), sheep.getY(), paint);
+                drawingHelper.draw(sheep);
             }
 
-            // draw score at the top
-            paint.setColor(Color.BLACK);
-            paint.setTextSize(bounds.y / 20);
-            paint.setTypeface(bold);
-            canvas.drawText("POINTS: " + points, 40, 70, paint);
+            int fontSize = bounds.y / 20;
+            drawingHelper.drawScore(points, fontSize, 40, 70);
 
             if (!playing){
-                canvas.drawColor(Color.argb(150, 255, 255, 255));
-                paint.setColor(Color.rgb(180, 0, 0));
-                paint.setTextSize(bounds.y / 4);
-                paint.setTextAlign(Paint.Align.CENTER);
-                paint.setStyle(Paint.Style.FILL);
-                paint.setFakeBoldText(true);
-                canvas.drawText(llama.isAlive() ? "PAUSED" : "GAME OVER", bounds.x / 2, bounds.y / 3, paint);
-                paint.setColor(Color.YELLOW);
-                if (newHigh){
-                    paint.setTextSize(paint.getTextSize() / 2);
-                }
-                canvas.drawText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
-                        bounds.x / 2, bounds.y / 3 + paint.getTextSize() + 50, paint);
-                paint.setTextSize(bounds.y / 12);
-                paint.setColor(Color.BLUE);
-                canvas.drawText("Tap to continue", bounds.x / 2, bounds.y * 3/4, paint);
+                drawingHelper.throwShade();
+                int xTextPosition = bounds.x / 2;
+                int yTextPosition = bounds.y / 3;
+                fontSize = bounds.y / 4;
+                drawingHelper.drawBoldText(llama.isAlive() ? "PAUSED" : "GAME OVER", fontSize,
+                        xTextPosition, yTextPosition, Color.rgb(180, 0, 0));
+                drawingHelper.drawBoldText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
+                        newHigh ? fontSize / 2 : fontSize, xTextPosition, yTextPosition + fontSize + 50,
+                        Color.YELLOW);
+                drawingHelper.drawBoldText("Tap to continue", bounds.y / 12, xTextPosition,
+                        bounds.y * 3/4, Color.BLUE);
             }
 
-            surfaceHolder.unlockCanvasAndPost(canvas);
+            drawingHelper.finish();
         }
+    }
 
+    private boolean readyToDraw() {
+        return surfaceHolder.getSurface().isValid();
     }
 
     private void control(long frameTime){

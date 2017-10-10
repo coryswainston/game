@@ -1,5 +1,6 @@
-package com.coryswainston.game;
+package com.coryswainston.game.objects;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 /**
@@ -17,6 +18,7 @@ public abstract class Sprite {
     protected int height;
     protected int width;
     protected boolean alive;
+    protected Context context;
 
     public abstract void update();
 

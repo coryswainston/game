@@ -1,14 +1,16 @@
-package com.coryswainston.game;
+package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.coryswainston.game.R;
+
 /**
  * @author Cory Swainston
  */
 
-public class Llama extends Sprite{
+public class Llama extends Sprite {
 
     private int yFloor;
     private int yCeiling;
@@ -17,19 +19,16 @@ public class Llama extends Sprite{
 
     private final int GRAVITY = 5;
 
-    public Llama(Context context){
+    public Llama(Context context, int height, int width){
+        this.context = context;
         x = 0;
         y = 0;
         dx = 0;
         dy = 0;
         alive = true;
         yCeiling = 400;
-        bitmapIdx = 0;
-        bitmaps = new Bitmap[2];
-        bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama1);
-        bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama2);
-        height = bitmaps[0].getHeight();
-        width = bitmaps[1].getWidth();
+        initializeBitmaps();
+        setSize(width, height);
         duckTimer = 0;
     }
 
@@ -47,11 +46,6 @@ public class Llama extends Sprite{
             y = yFloor;
             dy = 0;
         }
-        if (duckTimer > 0){
-            duckTimer--;
-        } else {
-            ducking = false;
-        }
     }
 
     public void jump() {
@@ -59,8 +53,11 @@ public class Llama extends Sprite{
     }
 
     public void duck() {
-        ducking = true;
-        duckTimer = 8;
+
+    }
+
+    public void release(){
+
     }
 
     public void setFloor(int yFloor){ this.yFloor = yFloor; }
@@ -73,4 +70,10 @@ public class Llama extends Sprite{
 
     public boolean isDucking(){return ducking;}
 
+    private void initializeBitmaps() {
+        bitmapIdx = 0;
+        bitmaps = new Bitmap[2];
+        bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama1);
+        bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.llama2);
+    }
 }

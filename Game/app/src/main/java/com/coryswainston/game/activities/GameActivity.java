@@ -1,4 +1,4 @@
-package com.coryswainston.game;
+package com.coryswainston.game.activities;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -6,6 +6,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.coryswainston.game.R;
+import com.coryswainston.game.views.GameView;
 
 public class GameActivity extends AppCompatActivity {
 

@@ -1,8 +1,11 @@
-package com.coryswainston.game;
+package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.coryswainston.game.R;
+import com.coryswainston.game.objects.Sprite;
 
 /**
  * @author Cory Swainston

@@ -1,9 +1,8 @@
-package com.coryswainston.game;
+package com.coryswainston.game.views;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,6 +12,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.coryswainston.game.activities.GameActivity;
+import com.coryswainston.game.activities.MainActivity;
+import com.coryswainston.game.objects.Llama;
 
 /**
  * The opening menu of the game
@@ -37,8 +40,7 @@ public class MenuView extends SurfaceView implements Runnable{
             Point bounds = new Point();
             ((Activity)context).getWindowManager().getDefaultDisplay().getSize(bounds);
 
-            Llama llama = new Llama(context);
-            llama.setSize(bounds.x / 6, bounds.x / 6);
+            Llama llama = new Llama(context, bounds.x / 6, bounds.x / 6);
             llama.setY(bounds.y / 4);
             llama.setX(bounds.x / 2);
 

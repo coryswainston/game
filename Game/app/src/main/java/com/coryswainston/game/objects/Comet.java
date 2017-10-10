@@ -1,8 +1,10 @@
-package com.coryswainston.game;
+package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.coryswainston.game.R;
 
 /**
  * For killin llamas
@@ -10,7 +12,7 @@ import android.graphics.BitmapFactory;
  * @author Cory Swainston
  */
 
-public class Comet extends Sprite{
+public class Comet extends Sprite {
 
     private int frameCtr;
     private boolean exploded;
