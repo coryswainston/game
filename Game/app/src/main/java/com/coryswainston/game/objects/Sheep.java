@@ -14,6 +14,8 @@ import com.coryswainston.game.objects.Sprite;
 public class Sheep extends Sprite {
 
     private int stepTimer;
+    private double a;
+    boolean isSeated;
 
     public Sheep(Context context){
         x = y = dy = dx = 0;
@@ -61,5 +63,13 @@ public class Sheep extends Sprite {
                 bitmapIdx = 2;
                 break;
         }
+    }
+
+    public void setA(double a) {
+        this.a = a;
+    }
+
+    public double getA() {
+        return a;
     }
 }

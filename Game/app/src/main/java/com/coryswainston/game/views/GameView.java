@@ -23,6 +23,7 @@ import com.coryswainston.game.objects.Sheep;
 import com.coryswainston.game.objects.Cloud;
 import com.coryswainston.game.objects.Comet;
 import com.coryswainston.game.objects.Llama;
+import com.coryswainston.game.objects.Sprite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,7 +57,7 @@ public class GameView extends SurfaceView implements Runnable {
     private Llama llama;
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
-    private Cloud[] clouds;
+    private final List<Cloud> clouds = new ArrayList<>(3);
     private int cometFrequency = INITIAL_FREQUENCY;
     private int sheepFrequency = INITIAL_FREQUENCY * 2;
 
@@ -97,19 +98,18 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void setUpClouds() {
-        clouds = new Cloud[3];
         for(int i = 0; i < 3; i++){
             Cloud cloud = new Cloud(context);
             cloud.setSize(bounds.y / 4, bounds.y / 6);
             cloud.setDx((float)(.5 - 0.1 * i));
-            clouds[i] = cloud;
+            clouds.add(i, cloud);
         }
-        clouds[0].setX(bounds.x / 2);
-        clouds[1].setX(bounds.x * 7 / 8);
-        clouds[2].setX(bounds.x / 6);
-        clouds[0].setY(bounds.y / 2);
-        clouds[1].setY(bounds.y / 4);
-        clouds[2].setY(0);
+        clouds.get(0).setX(bounds.x / 2);
+        clouds.get(1).setX(bounds.x * 7 / 8);
+        clouds.get(2).setX(bounds.x / 6);
+        clouds.get(0).setY(bounds.y / 2);
+        clouds.get(1).setY(bounds.y / 4);
+        clouds.get(2).setY(0);
     }
 
     private void getHighScore() {
@@ -144,13 +144,8 @@ public class GameView extends SurfaceView implements Runnable {
         switch (e.getActionMasked()){
             case MotionEvent.ACTION_DOWN: // when finger hits the screen
                 if (gestureHelper.isFirstTouch()) {
-                    gestureHelper.registerTouch(e);
+                    gestureHelper.down(e);
                     return true;
-                }
-                if (gestureHelper.isSwipeDown(e)){
-                    llama.duck();
-                } else {
-                    llama.release();
                 }
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
@@ -159,7 +154,7 @@ public class GameView extends SurfaceView implements Runnable {
                     context.startActivity(intent);
                 }
 
-                gestureHelper.release(e);
+                gestureHelper.up(e);
 
                 if (gestureHelper.noSwipe()) {
                     llama.setDx(0);
@@ -172,7 +167,8 @@ public class GameView extends SurfaceView implements Runnable {
                 } else if (gestureHelper.isSwipeUp()){
                     llama.jump();
                 } else {
-                    llama.release();
+                    Log.d("Gesture", "Swiped down foo");
+                    llama.duck();
                 }
                 return true;
         }
@@ -202,11 +198,11 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void updateClouds(){
-        for (int i = 0; i < 3; i++){
-            if (clouds[i].getX() < bounds.x){
-                clouds[i].update();
+        for (Cloud cloud : clouds){
+            if (cloud.getX() < bounds.x){
+                cloud.update();
             } else {
-                clouds[i].setX(0 - clouds[i].getWidth());
+                cloud.setX(0 - cloud.getWidth());
             }
         }
     }
@@ -268,12 +264,12 @@ public class GameView extends SurfaceView implements Runnable {
                 llama.kill();
             }
         }
-        for(Sheep sheep : sheeps){
+        for(Iterator<Sheep> it = sheeps.iterator(); it.hasNext();) {
+            Sheep sheep = it.next();
             Point sheepCenter = new Point(sheep.getX() + sheep.getWidth() / 2, sheep.getY());
             if (Math.abs(llamaCenter.x - sheepCenter.x) < 100 && llama.isDucking()) {
-                sheep.setX(llama.getX());
-                sheep.setY(llama.getY() - sheep.getHeight() / 2 - sheep.getHeight() * gatheredSheep);
-                gatheredSheep++;
+                it.remove();
+                llama.addToPile(sheep);
             }
         }
     }
@@ -302,17 +298,12 @@ public class GameView extends SurfaceView implements Runnable {
 
             drawingHelper.fillBackground(Color.rgb(180, 230, 255));
 
-            for (Cloud cloud : clouds){
-                drawingHelper.draw(cloud);
-            }
+            drawingHelper.draw(clouds);
             drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, Color.rgb(0, 100, 0)); // the ground
             drawingHelper.draw(llama);
-            for (Comet comet : comets) {
-                drawingHelper.draw(comet);
-            }
-            for (Sheep sheep : sheeps){
-                drawingHelper.draw(sheep);
-            }
+            drawingHelper.draw(llama.getSheepPile());
+            drawingHelper.draw(comets);
+            drawingHelper.draw(sheeps);
 
             int fontSize = bounds.y / 20;
             drawingHelper.drawScore(points, fontSize, 40, 70);
@@ -344,7 +335,6 @@ public class GameView extends SurfaceView implements Runnable {
         if (leftoverMillis < 5){
             leftoverMillis = 5;
         }
-        Log.d("MILLISECONDS: ", String.valueOf(leftoverMillis));
         try {
             gameThread.sleep(leftoverMillis);
         } catch (InterruptedException e) {
