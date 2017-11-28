@@ -46,6 +46,19 @@ public class DrawingHelper {
         }
     }
 
+    @SafeVarargs
+    public final void draw(Collection<? extends Sprite> ... collections) {
+        for (Collection<? extends Sprite> collection : collections) {
+            draw(collection);
+        }
+    }
+
+    public void draw(Sprite ... sprites) {
+        for (Sprite sprite : sprites) {
+            draw(sprite);
+        }
+    }
+
     public void drawRectangle(int left, int top, int right, int bottom, int color) {
         paint.setColor(color);
         canvas.drawRect(left, top, right, bottom, paint);

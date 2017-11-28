@@ -301,9 +301,7 @@ public class GameView extends SurfaceView implements Runnable {
             drawingHelper.draw(clouds);
             drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, Color.rgb(0, 100, 0)); // the ground
             drawingHelper.draw(llama);
-            drawingHelper.draw(llama.getSheepPile());
-            drawingHelper.draw(comets);
-            drawingHelper.draw(sheeps);
+            drawingHelper.draw(llama.getSheepPile(), comets, sheeps);
 
             int fontSize = bounds.y / 20;
             drawingHelper.drawScore(points, fontSize, 40, 70);
