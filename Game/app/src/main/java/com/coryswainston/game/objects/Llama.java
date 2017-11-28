@@ -51,19 +51,12 @@ public class Llama extends Sprite {
             y = yFloor;
             dy = 0;
         }
-        for (Sheep sheep : sheepPile) {
-            sheep.setDx(0);
-            sheep.setDy(0);
-            if (sheep.isSeated) {
-                sheep.setX(x);
-            } else {
-                sheep.setX(sheep.getX() + ((sheep.getX() - x) > 0 ? 1 : -1));
-                sheep.setY(new Float(sheep.getA() * Math.pow(x - sheep.getX(), 2) - yFloor + y));
-                Log.d("Here's some info", "A: " + sheep.getA() + ", " + sheep.getX() + ", " + sheep.getY());
-                if (sheep.getY() == y) {
-                    sheep.isSeated = true;
-                }
-            }
+        for (int i = 0; i < sheepPile.size(); i++) {
+            sheepPile.get(i).setDx(0);
+            sheepPile.get(i).setDy(0);
+            sheepPile.get(i).setX(x);
+            int sheepHeight = sheepPile.get(i).getHeight();
+            sheepPile.get(i).setY(y - sheepHeight - sheepHeight * i);
         }
     }
 
@@ -81,9 +74,6 @@ public class Llama extends Sprite {
 
     public void addToPile(Sheep sheep) {
         sheepPile.add(sheep);
-        float xDelta = sheep.getX() - x;
-        double a = y / Math.pow(xDelta, 2);
-        sheep.setA(a);
     }
 
     public void setFloor(int yFloor){ this.yFloor = yFloor; }
