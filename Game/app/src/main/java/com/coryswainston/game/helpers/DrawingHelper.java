@@ -11,15 +11,21 @@ import com.coryswainston.game.activities.MainActivity;
 import com.coryswainston.game.objects.Sprite;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Cory Swainston
  */
 
 public class DrawingHelper {
+    public static final int DARK_GREEN = Color.rgb(0, 100, 0);
+    public static final int SKY_BLUE = Color.rgb(180, 230, 255);
+    public static final int DARK_RED = Color.rgb(180, 0, 0);
+    public static final int BLUE = Color.BLUE;
+    public static final int YELLOW = Color.YELLOW;
+
     private final Typeface NORMAL_FONT;
     private final Typeface BOLD_FONT;
+
     private Paint paint = new Paint();
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;

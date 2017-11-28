@@ -23,6 +23,7 @@ public class Llama extends Sprite {
     private List<Sheep> sheepPile = new ArrayList<>();
 
     private final int GRAVITY = 5;
+    private final double EIGHTY_PERCENT = .8;
 
     public Llama(Context context, int height, int width){
         this.context = context;
@@ -55,8 +56,14 @@ public class Llama extends Sprite {
             sheepPile.get(i).setDx(0);
             sheepPile.get(i).setDy(0);
             sheepPile.get(i).setX(x);
-            int sheepHeight = sheepPile.get(i).getHeight();
+            int sheepHeight = (int)Math.round(sheepPile.get(i).getHeight() * EIGHTY_PERCENT);
             sheepPile.get(i).setY(y - sheepHeight - sheepHeight * i);
+        }
+
+        duckTimer += ducking ? 1 : 0;
+        if (duckTimer == 10) {
+            ducking = false;
+            duckTimer = 0;
         }
     }
 

@@ -4,12 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,11 +14,10 @@ import android.view.SurfaceView;
 import com.coryswainston.game.activities.MainActivity;
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.GestureHelper;
-import com.coryswainston.game.objects.Sheep;
 import com.coryswainston.game.objects.Cloud;
 import com.coryswainston.game.objects.Comet;
 import com.coryswainston.game.objects.Llama;
-import com.coryswainston.game.objects.Sprite;
+import com.coryswainston.game.objects.Sheep;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,7 +33,7 @@ import java.util.Random;
 public class GameView extends SurfaceView implements Runnable {
 
     private final long TARGET_MILLIS = 33;
-    private final int INITIAL_FREQUENCY = 50;
+    private final int INITIAL_FREQUENCY = 70;
     private final String HIGH_SCORE = "high_score";
     private final String LLAMA_PREFS = "llama_prefs";
 
@@ -60,12 +54,12 @@ public class GameView extends SurfaceView implements Runnable {
     private final List<Cloud> clouds = new ArrayList<>(3);
     private int cometFrequency = INITIAL_FREQUENCY;
     private int sheepFrequency = INITIAL_FREQUENCY * 2;
+    private int numberOfSheep = 5;
 
     int points = 0;
     int highScore;
     boolean newHigh;
-
-    private int gatheredSheep;
+    boolean gameWon;
 
     /**
      * Constructor, initializes everything for the game
@@ -179,6 +173,10 @@ public class GameView extends SurfaceView implements Runnable {
      * Move everything along
      */
     private void update(){
+        if (llama.getSheepPile().size() == numberOfSheep) {
+            playing = false;
+            gameWon = true;
+        }
         llama.update();
         updateComets();
         detectCollisions();
@@ -207,23 +205,23 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void updateSheep(){
+    private void updateSheep() {
         Sheep newSheep = null;
         Random random = new Random();
-        if (random.nextInt(sheepFrequency) == 1 && sheeps.size() < 5){
+        if (random.nextInt(sheepFrequency) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep) {
             newSheep = new Sheep(getContext());
         }
-        if (newSheep != null){
+        if (newSheep != null) {
             newSheep.setSize(bounds.y / 6, bounds.y / 9);
             newSheep.setX(random.nextInt(2) == 1 ? bounds.x : -newSheep.getWidth());
             newSheep.setY(yFloor - newSheep.getHeight());
             newSheep.setDx(newSheep.getX() > 0 ? -5 : 5);
-            if (newSheep.getDx() < 0){
+            if (newSheep.getDx() < 0) {
                 newSheep.turnLeft();
             }
             sheeps.add(newSheep);
         }
-        for (Sheep sheep : sheeps){
+        for (Sheep sheep : sheeps) {
             sheep.update();
         }
     }
@@ -270,6 +268,7 @@ public class GameView extends SurfaceView implements Runnable {
             if (Math.abs(llamaCenter.x - sheepCenter.x) < 100 && llama.isDucking()) {
                 it.remove();
                 llama.addToPile(sheep);
+                points += 100;
             }
         }
     }
@@ -293,35 +292,41 @@ public class GameView extends SurfaceView implements Runnable {
      * You know what this one does
      */
     private void draw(){
-        if(readyToDraw()) {
-            DrawingHelper drawingHelper = new DrawingHelper(context, surfaceHolder);
-
-            drawingHelper.fillBackground(Color.rgb(180, 230, 255));
-
-            drawingHelper.draw(clouds);
-            drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, Color.rgb(0, 100, 0)); // the ground
-            drawingHelper.draw(llama);
-            drawingHelper.draw(llama.getSheepPile(), comets, sheeps);
-
-            int fontSize = bounds.y / 20;
-            drawingHelper.drawScore(points, fontSize, 40, 70);
-
-            if (!playing){
-                drawingHelper.throwShade();
-                int xTextPosition = bounds.x / 2;
-                int yTextPosition = bounds.y / 3;
-                fontSize = bounds.y / 4;
-                drawingHelper.drawBoldText(llama.isAlive() ? "PAUSED" : "GAME OVER", fontSize,
-                        xTextPosition, yTextPosition, Color.rgb(180, 0, 0));
-                drawingHelper.drawBoldText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
-                        newHigh ? fontSize / 2 : fontSize, xTextPosition, yTextPosition + fontSize + 50,
-                        Color.YELLOW);
-                drawingHelper.drawBoldText("Tap to continue", bounds.y / 12, xTextPosition,
-                        bounds.y * 3/4, Color.BLUE);
-            }
-
-            drawingHelper.finish();
+        if(!readyToDraw()) {
+            return;
         }
+
+        DrawingHelper drawingHelper = new DrawingHelper(context, surfaceHolder);
+
+        drawingHelper.fillBackground(DrawingHelper.SKY_BLUE);
+
+        drawingHelper.draw(clouds);
+        drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
+        drawingHelper.draw(llama);
+        drawingHelper.draw(llama.getSheepPile(), comets, sheeps);
+
+        int fontSize = bounds.y / 20;
+        drawingHelper.drawScore(points, fontSize, 40, 70);
+
+        if (!playing){
+            drawingHelper.throwShade();
+            int xTextPosition = bounds.x / 2;
+            int yTextPosition = bounds.y / 3;
+            fontSize = bounds.y / 4;
+            String messageText = "GAME OVER";
+            if (llama.isAlive()) {
+                messageText = gameWon ? "YOU WIN!" : "PAUSED";
+            }
+            drawingHelper.drawBoldText(messageText, fontSize, xTextPosition, yTextPosition,
+                    DrawingHelper.BLUE);
+            drawingHelper.drawBoldText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
+                    newHigh ? fontSize / 2 : fontSize, xTextPosition, yTextPosition + fontSize + 50,
+                    DrawingHelper.DARK_GREEN);
+            drawingHelper.drawBoldText("Tap to continue", bounds.y / 12, xTextPosition,
+                    bounds.y * 3/4, DrawingHelper.DARK_RED);
+        }
+
+        drawingHelper.finish();
     }
 
     private boolean readyToDraw() {
