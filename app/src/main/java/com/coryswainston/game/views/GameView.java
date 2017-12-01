@@ -227,16 +227,9 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void updateComets(){
-        Comet newComet = null;
         Random random = new Random();
-        if (random.nextInt(cometFrequency) == 1 && comets.size() < 3){
-            newComet = new Comet(getContext(), random.nextInt(bounds.x));
-        }
-        if (newComet != null){
-            newComet.setSize(bounds.y /10, bounds.y / 7);
-            newComet.setDy(bounds.y / 50);
-            newComet.setDx(random.nextInt(6) - 3);
-            comets.add(newComet);
+        if (random.nextInt(cometFrequency) == 1 && comets.size() < 3) {
+            comets.add(getNewComet());
         }
         for (Iterator<Comet> it = comets.iterator(); it.hasNext();){
             Comet comet = it.next();
@@ -249,6 +242,17 @@ public class GameView extends SurfaceView implements Runnable {
                 points += 10;
             }
         }
+    }
+
+    private Comet getNewComet() {
+        Random random = new Random();
+        Comet newComet = new Comet(getContext(), random.nextInt(bounds.x));
+        newComet.setSize(bounds.y /10, bounds.y / 7);
+        newComet.setDy(bounds.y / 100);
+        newComet.setDx(random.nextInt(bounds.y / 100) - bounds.y / 200);
+        newComet.setY(-newComet.getHeight());
+
+        return newComet;
     }
 
     private void detectCollisions(){

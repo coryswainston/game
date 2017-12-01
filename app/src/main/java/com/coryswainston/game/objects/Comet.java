@@ -19,9 +19,7 @@ public class Comet extends Sprite {
 
     public Comet(Context context, int x){
         this.x = x;
-        y = 0;
-        dy = 20;
-        dx = (int)(Math.random() * 20) - 10;
+
         frameCtr = 0;
         alive = true;
         exploded = false;
@@ -30,8 +28,6 @@ public class Comet extends Sprite {
         bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet1);
         bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet2);
         bitmaps[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet3);
-        width = 60;
-        height = 90;
     }
 
     public void update(){
