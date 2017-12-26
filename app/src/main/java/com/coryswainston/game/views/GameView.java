@@ -29,7 +29,6 @@ import java.util.Random;
  *
  * @author Cory Swainston
  */
-
 public class GameView extends SurfaceView implements Runnable {
 
     private final long TARGET_MILLIS = 33;
@@ -133,6 +132,7 @@ public class GameView extends SurfaceView implements Runnable {
      * @return whether event is consumed
      */
     @Override
+    @SuppressWarnings("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent e){
 
         switch (e.getActionMasked()){
@@ -343,7 +343,7 @@ public class GameView extends SurfaceView implements Runnable {
             leftoverMillis = 5;
         }
         try {
-            gameThread.sleep(leftoverMillis);
+            Thread.sleep(leftoverMillis);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
