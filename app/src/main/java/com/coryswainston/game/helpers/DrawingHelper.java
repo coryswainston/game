@@ -17,6 +17,9 @@ import java.util.Collection;
  */
 
 public class DrawingHelper {
+    /**
+     * Colors for convenience
+     */
     public static final int DARK_GREEN = Color.rgb(0, 100, 0);
     public static final int SKY_BLUE = Color.rgb(180, 230, 255);
     public static final int DARK_RED = Color.rgb(180, 0, 0);
@@ -30,6 +33,12 @@ public class DrawingHelper {
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
 
+    /**
+     * Constructor.
+     *
+     * @param context of the activity.
+     * @param surfaceHolder for view on which to draw.
+     */
     public DrawingHelper(Context context, SurfaceHolder surfaceHolder) {
         NORMAL_FONT = Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT);
         BOLD_FONT = Typeface.create(NORMAL_FONT, Typeface.BOLD);
@@ -38,20 +47,49 @@ public class DrawingHelper {
         canvas = surfaceHolder.lockCanvas();
     }
 
+    /**
+     * Is the surface ready to draw? Cannot draw anything if this is false.
+     *
+     * @return true if the surface is ready to be drawn on.
+     */
+    public boolean readyToDraw() {
+        return surfaceHolder.getSurface().isValid();
+    }
+
+    /**
+     * Fill the background with a certain color.
+     *
+     * @param color of the background.
+     */
     public void fillBackground(int color) {
         canvas.drawColor(color);
     }
 
+    /**
+     * Draws a given Sprite.
+     *
+     * @param sprite to draw.
+     */
     public void draw(Sprite sprite) {
         canvas.drawBitmap(sprite.getBitmap(), sprite.getX(), sprite.getY(), paint);
     }
 
+    /**
+     * Draws a collection o Sprites.
+     *
+     * @param sprites to draw.
+     */
     public void draw(Collection<? extends Sprite> sprites) {
         for (Sprite sprite : sprites) {
             draw(sprite);
         }
     }
 
+    /**
+     * Draw a series of Sprites. This method allows for passing several collections.
+     *
+     * @param collections of Sprites to draw.
+     */
     @SafeVarargs
     public final void draw(Collection<? extends Sprite> ... collections) {
         for (Collection<? extends Sprite> collection : collections) {
@@ -59,17 +97,40 @@ public class DrawingHelper {
         }
     }
 
+    /**
+     * Draw a series of Sprites. This allows for the passing of several individual Sprites
+     * not in a collection.
+     *
+     * @param sprites to draw.
+     */
     public void draw(Sprite ... sprites) {
         for (Sprite sprite : sprites) {
             draw(sprite);
         }
     }
 
+    /**
+     * Draws a rectangle.
+     *
+     * @param left boundary.
+     * @param top "
+     * @param right "
+     * @param bottom "
+     * @param color of the rectangle.
+     */
     public void drawRectangle(int left, int top, int right, int bottom, int color) {
         paint.setColor(color);
         canvas.drawRect(left, top, right, bottom, paint);
     }
 
+    /**
+     * Draws the score.
+     *
+     * @param points to be drawn.
+     * @param fontSize of the score.
+     * @param x coordinate.
+     * @param y coordinate.
+     */
     public void drawScore(int points, int fontSize, int x, int y) {
         paint.setColor(Color.BLACK);
         paint.setTextSize(fontSize);
@@ -77,6 +138,15 @@ public class DrawingHelper {
         canvas.drawText("SCORE: " + points, x, y, paint);
     }
 
+    /**
+     * Draws text in a bold typeface.
+     *
+     * @param text to draw.
+     * @param fontSize of the text.
+     * @param x coordinate.
+     * @param y coordinate.
+     * @param color of the text.
+     */
     public void drawBoldText(String text, int fontSize, int x, int y, int color) {
         paint.setTypeface(BOLD_FONT);
         paint.setColor(color);
@@ -87,10 +157,17 @@ public class DrawingHelper {
         canvas.drawText(text, x, y, paint);
     }
 
+    /**
+     * Casts a white shadow over the scene.
+     */
     public void throwShade() {
         canvas.drawColor(Color.argb(150, 255, 255, 255));
     }
 
+    /**
+     * To be called when drawing instructions are given. This method actually performs the
+     * drawing.
+     */
     public void finish() {
         surfaceHolder.unlockCanvasAndPost(canvas);
     }

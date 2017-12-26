@@ -302,11 +302,10 @@ public class GameView extends SurfaceView implements Runnable {
      * You know what this one does
      */
     private void draw(){
-        if(!readyToDraw()) {
+        DrawingHelper drawingHelper = new DrawingHelper(context, surfaceHolder);
+        if (!drawingHelper.readyToDraw()) {
             return;
         }
-
-        DrawingHelper drawingHelper = new DrawingHelper(context, surfaceHolder);
 
         drawingHelper.fillBackground(DrawingHelper.SKY_BLUE);
 
@@ -339,10 +338,6 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         drawingHelper.finish();
-    }
-
-    private boolean readyToDraw() {
-        return surfaceHolder.getSurface().isValid();
     }
 
     private void control(long frameTime){
