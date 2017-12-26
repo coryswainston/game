@@ -14,8 +14,10 @@ import android.view.SurfaceView;
 import com.coryswainston.game.activities.MainActivity;
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.GestureHelper;
+import com.coryswainston.game.helpers.HoorahManager;
 import com.coryswainston.game.objects.Cloud;
 import com.coryswainston.game.objects.Comet;
+import com.coryswainston.game.objects.Hoorah;
 import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sheep;
 
@@ -42,6 +44,7 @@ public class GameView extends SurfaceView implements Runnable {
     GestureHelper gestureHelper = new GestureHelper();
     private Point bounds;
     private int yFloor;
+    private HoorahManager hoorahManager;
 
     private Context context;
     private SoundPool soundPool;
@@ -88,6 +91,7 @@ public class GameView extends SurfaceView implements Runnable {
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(bounds);
         yFloor = bounds.y - bounds.y / 7;
         surfaceHolder.setFixedSize(bounds.x, bounds.y);
+        hoorahManager = new HoorahManager(bounds);
     }
 
     private void setUpClouds() {
@@ -273,6 +277,8 @@ public class GameView extends SurfaceView implements Runnable {
                 it.remove();
                 llama.addToPile(sheep);
                 points += 100;
+                hoorahManager.makeHoorah(sheepCenter, HoorahManager.FontSize.SMALL, Hoorah.TIME_MED,
+                        "+100");
             }
         }
     }
@@ -308,6 +314,8 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
         drawingHelper.draw(llama);
         drawingHelper.draw(llama.getSheepPile(), comets, sheeps);
+
+        hoorahManager.drawHoorahs(drawingHelper);
 
         int fontSize = bounds.y / 20;
         drawingHelper.drawScore(points, fontSize, 40, 70);

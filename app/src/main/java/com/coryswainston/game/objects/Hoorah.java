@@ -1,6 +1,7 @@
 package com.coryswainston.game.objects;
 
 import android.graphics.Bitmap;
+import android.graphics.Point;
 
 /**
  * A class for objects to be temporarily drawn
@@ -13,7 +14,48 @@ public class Hoorah {
     public static final int TIME_MED = 25;
     public static final int TIME_SHORT = 10;
 
-    private int counter;
+    private Point position;
+    private int size;
+    private int duration;
+    private String text;
+
+    public boolean countdown() {
+        duration--;
+
+        return duration != 0;
+    }
+
+    public Point getPosition() {
+        return position;
+    }
+
+    public void setPosition(Point position) {
+        this.position = position;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 
     // TODO implement to take drawText() params and an optional background
     // TODO contain a draw() function that uses DrawingHelper.drawText()
