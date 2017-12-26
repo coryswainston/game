@@ -75,7 +75,7 @@ public class GameView extends SurfaceView implements Runnable {
         setUpBoundaries();
         createLlama();
         setUpClouds();
-        getHighScore();
+        loadHighScore();
     }
 
     private void createLlama() {
@@ -109,8 +109,8 @@ public class GameView extends SurfaceView implements Runnable {
         clouds.get(2).setY(0);
     }
 
-    private void getHighScore() {
-        sharedPreferences = context.getSharedPreferences(LLAMA_PREFS, 0);
+    private void loadHighScore() {
+        sharedPreferences = context.getSharedPreferences(LLAMA_PREFS, Context.MODE_PRIVATE);
         highScore = sharedPreferences.getInt(HIGH_SCORE, 0);
         newHigh = false;
     }
@@ -125,7 +125,7 @@ public class GameView extends SurfaceView implements Runnable {
             draw();
 
             long frameTime = System.currentTimeMillis() - startMillis;
-            control(frameTime);
+            controlFrameRate(frameTime);
         }
     }
 
@@ -340,7 +340,7 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.finish();
     }
 
-    private void control(long frameTime){
+    private void controlFrameRate(long frameTime){
         long leftoverMillis = TARGET_MILLIS - frameTime;
         if (leftoverMillis < 5){
             leftoverMillis = 5;
