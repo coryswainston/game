@@ -10,11 +10,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.coryswainston.game.activities.MainActivity;
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.GestureHelper;
 import com.coryswainston.game.helpers.HoorahManager;
+import com.coryswainston.game.helpers.ViewListener;
 import com.coryswainston.game.objects.Cloud;
 import com.coryswainston.game.objects.Comet;
 import com.coryswainston.game.objects.Hoorah;
@@ -47,6 +49,7 @@ public class GameView extends SurfaceView implements Runnable {
     private HoorahManager hoorahManager;
 
     private Context context;
+    private ViewListener viewListener;
     private SoundPool soundPool;
     private SharedPreferences sharedPreferences;
 
@@ -58,7 +61,8 @@ public class GameView extends SurfaceView implements Runnable {
     private int sheepFrequency = INITIAL_FREQUENCY * 2;
     private int numberOfSheep = 5;
 
-    int points = 0;
+    int points;
+    int level;
     int highScore;
     boolean newHigh;
     boolean gameWon;
@@ -68,14 +72,19 @@ public class GameView extends SurfaceView implements Runnable {
      *
      * @param context the activity we're in
      */
-    public GameView(Context context){
+    public GameView(Context context, int points, int level){
         super(context);
         this.context = context;
+        this.points = points;
+        this.level = level;
 
         setUpBoundaries();
         createLlama();
         setUpClouds();
         loadHighScore();
+
+        hoorahManager.makeHoorah(hoorahManager.getCenter(), HoorahManager.FontSize.MEDIUM,
+                Hoorah.TIME_LONG, "LEVEL " + level);
     }
 
     private void createLlama() {
@@ -147,9 +156,11 @@ public class GameView extends SurfaceView implements Runnable {
                 }
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
-                if(!playing){
-                    Intent intent = new Intent(context, MainActivity.class);
-                    context.startActivity(intent);
+                if(!playing) {
+                    Log.d("GameView", "Bout to return with score " + points);
+                    Intent intent = new Intent();
+                    intent.putExtra("score", points);
+                    getListener().onAction(intent);
                 }
 
                 gestureHelper.up(e);
@@ -365,5 +376,17 @@ public class GameView extends SurfaceView implements Runnable {
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    public void setListener(ViewListener listener) {
+        this.viewListener = listener;
+    }
+
+    public ViewListener getListener() {
+        if (viewListener == null) {
+            throw new IllegalStateException("Listener is null!");
+        } else {
+            return viewListener;
+        }
     }
 }

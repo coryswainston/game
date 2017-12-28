@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/llogo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity" android:noHistory="true">
+        <activity android:name=".activities.MainActivity" android:noHistory="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

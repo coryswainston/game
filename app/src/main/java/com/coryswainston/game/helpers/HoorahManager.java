@@ -42,6 +42,10 @@ public class HoorahManager {
         }
     }
 
+    public Point getCenter() {
+        return new Point(bounds.x / 2, bounds.y / 2);
+    }
+
     public void makeHoorah(Point pos, FontSize size, int duration, String text) {
         Hoorah hoorah = new Hoorah();
         hoorah.setPosition(pos);

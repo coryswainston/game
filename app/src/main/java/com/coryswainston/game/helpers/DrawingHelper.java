@@ -44,7 +44,9 @@ public class DrawingHelper {
         BOLD_FONT = Typeface.create(NORMAL_FONT, Typeface.BOLD);
         paint.setTypeface(NORMAL_FONT);
         this.surfaceHolder = surfaceHolder;
-        canvas = surfaceHolder.lockCanvas();
+        if (readyToDraw()) {
+            canvas = surfaceHolder.lockCanvas();
+        }
     }
 
     /**

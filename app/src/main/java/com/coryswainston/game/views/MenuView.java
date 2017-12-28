@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.coryswainston.game.activities.GameActivity;
 import com.coryswainston.game.activities.MainActivity;
+import com.coryswainston.game.helpers.ViewListener;
 import com.coryswainston.game.objects.Llama;
 
 /**
@@ -24,6 +26,7 @@ import com.coryswainston.game.objects.Llama;
 public class MenuView extends SurfaceView implements Runnable{
     private Context context;
     private Thread thread = null;
+    private ViewListener viewListener;
     volatile boolean running = false;
 
     public MenuView(Context context){
@@ -77,11 +80,10 @@ public class MenuView extends SurfaceView implements Runnable{
     }
 
     @Override
+    @SuppressWarnings("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent e){
         if (e.getActionMasked() == MotionEvent.ACTION_DOWN){
-            Log.d("motion event", "was indeed up");
-            Intent intent = new Intent(context, GameActivity.class);
-            context.startActivity(intent);
+            getViewListener().onAction(new Intent());
         }
         return super.onTouchEvent(e);
     }
@@ -111,5 +113,17 @@ public class MenuView extends SurfaceView implements Runnable{
         running = true;
         thread = new Thread(this);
         thread.start();
+    }
+
+    public void setViewListener(ViewListener listener) {
+        this.viewListener = listener;
+    }
+
+    public ViewListener getViewListener() {
+        if (viewListener == null) {
+            throw new IllegalStateException("ViewListener is null.");
+        } else {
+            return viewListener;
+        }
     }
 }
