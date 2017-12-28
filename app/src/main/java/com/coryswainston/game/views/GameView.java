@@ -36,7 +36,6 @@ import java.util.Random;
 public class GameView extends SurfaceView implements Runnable {
 
     private final long TARGET_MILLIS = 33;
-    private final int INITIAL_FREQUENCY = 70;
     private final String HIGH_SCORE = "high_score";
     private final String LLAMA_PREFS = "llama_prefs";
 
@@ -57,9 +56,9 @@ public class GameView extends SurfaceView implements Runnable {
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
     private final List<Cloud> clouds = new ArrayList<>(3);
-    private int cometFrequency = INITIAL_FREQUENCY;
-    private int sheepFrequency = INITIAL_FREQUENCY * 2;
-    private int numberOfSheep = 5;
+    private int cometFrequency;
+    private int sheepFrequency;
+    private int numberOfSheep;
 
     int points;
     int level;
@@ -82,9 +81,17 @@ public class GameView extends SurfaceView implements Runnable {
         createLlama();
         setUpClouds();
         loadHighScore();
+        initializeGameConditions();
 
         hoorahManager.makeHoorah(hoorahManager.getCenter(), HoorahManager.FontSize.MEDIUM,
                 Hoorah.TIME_LONG, "LEVEL " + level);
+    }
+
+    private void initializeGameConditions() {
+        int frequency = 2000 / (13 + level);
+        cometFrequency = frequency;
+        sheepFrequency = frequency * 5 / 8;
+        numberOfSheep = level;
     }
 
     private void createLlama() {
