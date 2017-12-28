@@ -137,6 +137,7 @@ public class DrawingHelper {
         paint.setColor(Color.BLACK);
         paint.setTextSize(fontSize);
         paint.setTypeface(BOLD_FONT);
+        paint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText("SCORE: " + points, x, y, paint);
     }
 
