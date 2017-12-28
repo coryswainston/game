@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
                 data.toString() + "'");
         if (requestCode == resultCode) {
             startLevel(data);
+        } else {
+            level = 0;
         }
     }
 

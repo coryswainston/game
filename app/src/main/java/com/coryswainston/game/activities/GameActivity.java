@@ -65,7 +65,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void onLevelFinishedOrGameOver(Intent data) {
         Log.d("GameActivity", "Finished level. data=" + data.toString());
-        setResult(1, data);
+        int resultCode = data.getBooleanExtra("continue", false) ? 1 : 0;
+        setResult(resultCode, data);
         finish();
     }
 }

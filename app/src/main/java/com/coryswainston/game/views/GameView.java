@@ -175,7 +175,8 @@ public class GameView extends SurfaceView implements Runnable {
                 if(!playing) {
                     Log.d("GameView", "Bout to return with score " + points);
                     Intent intent = new Intent();
-                    intent.putExtra("score", points);
+                    intent.putExtra("score", gameWon ? points : 0);
+                    intent.putExtra("continue", gameWon);
                     getListener().onAction(intent);
                 }
 
@@ -270,7 +271,6 @@ public class GameView extends SurfaceView implements Runnable {
             comet.update();
             if (!comet.isAlive()){
                 it.remove();
-                points += 10;
             }
         }
     }
@@ -295,6 +295,21 @@ public class GameView extends SurfaceView implements Runnable {
                 comet.explode();
                 playing = false;
                 llama.kill();
+            }
+            List<Sheep> allSheeps = new ArrayList<>();
+            allSheeps.addAll(sheeps);
+            allSheeps.addAll(llama.getSheepPile());
+            for (Sheep sheep : allSheeps) {
+                Point sheepCenter = new Point(sheep.getX() + sheep.getWidth() / 2, sheep.getY());
+                if (Math.abs(cometCenter.x - sheepCenter.x) < sheep.getWidth() / 2.1 + sheep.getWidth() / 2 &&
+                        cometCenter.y - sheepCenter.y >= 0) {
+                    if (!sheep.isBurnt()) {
+                        points -= 50;
+                        hoorahManager.makeHoorah(cometCenter, HoorahManager.FontSize.SMALL, Hoorah.TIME_MED,
+                                "-50");
+                        sheep.setBurnt(true);
+                    }
+                }
             }
         }
         for(Iterator<Sheep> it = sheeps.iterator(); it.hasNext();) {

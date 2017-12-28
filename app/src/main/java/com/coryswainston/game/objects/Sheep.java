@@ -15,7 +15,7 @@ public class Sheep extends Sprite {
 
     private int stepTimer;
     private double a;
-    boolean isSeated;
+    boolean burnt;
 
     public Sheep(Context context){
         x = y = dy = dx = 0;
@@ -26,6 +26,7 @@ public class Sheep extends Sprite {
         bitmaps[3] = BitmapFactory.decodeResource(context.getResources(), R.drawable.sheep4);
         bitmapIdx = 0;
         alive = true;
+        burnt = false;
         stepTimer = 0;
     }
 
@@ -71,5 +72,13 @@ public class Sheep extends Sprite {
 
     public double getA() {
         return a;
+    }
+
+    public boolean isBurnt() {
+        return burnt;
+    }
+
+    public void setBurnt(boolean burnt) {
+        this.burnt = burnt;
     }
 }
