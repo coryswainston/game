@@ -34,9 +34,9 @@ public class HoorahManager {
     private int getIntFromFontSize(FontSize fontSize) {
         switch (fontSize) {
             case LARGE:
-                return bounds.y / 8;
+                return bounds.y / 4;
             case MEDIUM:
-                return bounds.y / 12;
+                return bounds.y / 8;
             case SMALL: default:
                 return bounds.y / 16;
         }
@@ -64,6 +64,7 @@ public class HoorahManager {
                     hoorah.getPosition().y, DrawingHelper.DARK_RED);
 
             hoorah.getPosition().offset(0, -bounds.y / 500);
+
             boolean keepDrawing = hoorah.countdown();
             if (!keepDrawing) {
                 toRemove.add(hoorah);

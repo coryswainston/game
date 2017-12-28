@@ -10,9 +10,9 @@ import android.graphics.Point;
  */
 
 public class Hoorah {
-    public static final int TIME_LONG = 50;
-    public static final int TIME_MED = 25;
-    public static final int TIME_SHORT = 10;
+    public static final int TIME_LONG = 75;
+    public static final int TIME_MED = 50;
+    public static final int TIME_SHORT = 25;
 
     private Point position;
     private int size;
