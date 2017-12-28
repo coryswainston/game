@@ -126,19 +126,20 @@ public class DrawingHelper {
     }
 
     /**
-     * Draws the score.
+     * Draws the score and level.
      *
      * @param points to be drawn.
+     * @param level to be drawn.
      * @param fontSize of the score.
      * @param x coordinate.
      * @param y coordinate.
      */
-    public void drawScore(int points, int fontSize, int x, int y) {
+    public void drawScoreAndLevel(int points, int level, int fontSize, int x, int y) {
         paint.setColor(Color.BLACK);
         paint.setTextSize(fontSize);
         paint.setTypeface(BOLD_FONT);
         paint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText("SCORE: " + points, x, y, paint);
+        canvas.drawText("SCORE: " + points + "  LEVEL: " + level, x, y, paint);
     }
 
     /**

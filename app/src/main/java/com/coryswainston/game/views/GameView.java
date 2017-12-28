@@ -10,9 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
-import com.coryswainston.game.activities.MainActivity;
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.GestureHelper;
 import com.coryswainston.game.helpers.HoorahManager;
@@ -67,11 +65,22 @@ public class GameView extends SurfaceView implements Runnable {
     boolean gameWon;
 
     /**
-     * Constructor, initializes everything for the game
+     * Standard View constructor.
      *
-     * @param context the activity we're in
+     * @param context of the activity.
      */
-    public GameView(Context context, int points, int level){
+    public GameView(Context context) {
+        this(context, 0, 1);
+    }
+
+    /**
+     * Constructor, initializes everything for the game.
+     *
+     * @param context the activity we're in.
+     * @param points carried over from previous level.
+     * @param level the user is currently in.
+     */
+    public GameView(Context context, int points, int level) {
         super(context);
         this.context = context;
         this.points = points;
@@ -88,9 +97,9 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void initializeGameConditions() {
-        int frequency = 2000 / (13 + level);
+        int frequency = 2000 / (20 + level);
         cometFrequency = frequency;
-        sheepFrequency = frequency * 5 / 8;
+        sheepFrequency = frequency / 2;
         numberOfSheep = level;
     }
 
@@ -250,7 +259,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void updateComets(){
         Random random = new Random();
-        if (random.nextInt(cometFrequency) == 1 && comets.size() < 3) {
+        if (random.nextInt(cometFrequency) == 1 && comets.size() < level + 2) {
             comets.add(getNewComet());
         }
         for (Iterator<Comet> it = comets.iterator(); it.hasNext();){
@@ -269,9 +278,9 @@ public class GameView extends SurfaceView implements Runnable {
     private Comet getNewComet() {
         Random random = new Random();
         Comet newComet = new Comet(getContext(), random.nextInt(bounds.x));
-        newComet.setSize(bounds.y /10, bounds.y / 7);
-        newComet.setDy(bounds.y / 100);
-        newComet.setDx(random.nextInt(bounds.y / 100) - bounds.y / 200);
+        newComet.setSize(bounds.y / 8, bounds.y / 5);
+        newComet.setDy(bounds.y / 80);
+        newComet.setDx(random.nextInt(bounds.y / 120) - bounds.y / 240);
         newComet.setY(-newComet.getHeight());
 
         return newComet;
@@ -330,12 +339,12 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.draw(clouds);
         drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
         drawingHelper.draw(llama);
-        drawingHelper.draw(llama.getSheepPile(), comets, sheeps);
+        drawingHelper.draw(llama.getSheepPile(), sheeps, comets);
 
         hoorahManager.drawHoorahs(drawingHelper);
 
         int fontSize = bounds.y / 20;
-        drawingHelper.drawScore(points, fontSize, 40, 70);
+        drawingHelper.drawScoreAndLevel(points, level, fontSize, 40, 70);
 
         if (!playing){
             drawingHelper.throwShade();
