@@ -12,6 +12,10 @@ import com.coryswainston.game.R;
 import com.coryswainston.game.helpers.ViewListener;
 import com.coryswainston.game.views.GameView;
 
+import static com.coryswainston.game.Game.CONTINUE;
+import static com.coryswainston.game.Game.LEVEL;
+import static com.coryswainston.game.Game.SCORE;
+
 public class GameActivity extends AppCompatActivity {
 
     private GameView gameView;
@@ -22,8 +26,8 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
-        int score = getIntent().getIntExtra("score", 0);
-        int level = getIntent().getIntExtra("level", 1);
+        int score = getIntent().getIntExtra(SCORE, 0);
+        int level = getIntent().getIntExtra(LEVEL, 1);
 
         gameView = new GameView(this, score, level);
         gameView.setListener(new ViewListener() {
@@ -65,7 +69,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void onLevelFinishedOrGameOver(Intent data) {
         Log.d("GameActivity", "Finished level. data=" + data.toString());
-        int resultCode = data.getBooleanExtra("continue", false) ? 1 : 0;
+        int resultCode = data.getBooleanExtra(CONTINUE, false) ? 1 : 0;
         setResult(resultCode, data);
         finish();
     }

@@ -26,6 +26,8 @@ public class DrawingHelper {
     public static final int BLUE = Color.BLUE;
     public static final int YELLOW = Color.YELLOW;
 
+    private static final String HANKEN_BOOK_FONT = "Hanken-Book.ttf";
+
     private final Typeface NORMAL_FONT;
     private final Typeface BOLD_FONT;
 
@@ -40,7 +42,7 @@ public class DrawingHelper {
      * @param surfaceHolder for view on which to draw.
      */
     public DrawingHelper(Context context, SurfaceHolder surfaceHolder) {
-        NORMAL_FONT = Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT);
+        NORMAL_FONT = Typeface.createFromAsset(context.getAssets(), HANKEN_BOOK_FONT);
         BOLD_FONT = Typeface.create(NORMAL_FONT, Typeface.BOLD);
         paint.setTypeface(NORMAL_FONT);
         this.surfaceHolder = surfaceHolder;

@@ -9,9 +9,10 @@ import android.util.Log;
 import com.coryswainston.game.helpers.ViewListener;
 import com.coryswainston.game.views.MenuView;
 
-public class MainActivity extends AppCompatActivity {
+import static com.coryswainston.game.Game.LEVEL;
+import static com.coryswainston.game.Game.SCORE;
 
-    public static final String HANKEN_BOOK_FONT = "Hanken-Book.ttf";
+public class MainActivity extends AppCompatActivity {
 
     private MenuView menuView;
     private int level = 0;
@@ -58,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private void startLevel(Intent data) {
         Log.d("MainActivity", "Starting new level.");
         Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra("score", data.getIntExtra("score", 0));
-        intent.putExtra("level", ++level);
+        intent.putExtra(SCORE, data.getIntExtra(SCORE, 0));
+        intent.putExtra(LEVEL, ++level);
         startActivityForResult(intent, 1);
     }
 }
