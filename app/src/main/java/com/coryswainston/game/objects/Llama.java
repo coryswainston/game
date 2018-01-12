@@ -69,7 +69,7 @@ public class Llama extends Sprite {
         }
 
         duckTimer += ducking ? 1 : 0;
-        if (duckTimer == 10) {
+        if (duckTimer == 5) {
             ducking = false;
             duckTimer = 0;
         }

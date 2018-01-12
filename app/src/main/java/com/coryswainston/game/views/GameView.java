@@ -349,6 +349,8 @@ public class GameView extends SurfaceView implements Runnable {
             return;
         }
 
+        // just to clear canvas
+        drawingHelper.fillBackground(DrawingHelper.WHITE);
         drawingHelper.fillBackground(DrawingHelper.SKY_BLUE);
 
         drawingHelper.draw(clouds);

@@ -21,15 +21,21 @@ public class DrawingHelper {
      * Colors for convenience
      */
     public static final int DARK_GREEN = Color.rgb(0, 100, 0);
-    public static final int SKY_BLUE = Color.rgb(180, 230, 255);
+    public static final int SKY_BLUE = Color.rgb(100, 215, 255);
     public static final int DARK_RED = Color.rgb(180, 0, 0);
+    public static final int WHITE = Color.WHITE;
     public static final int BLUE = Color.BLUE;
     public static final int YELLOW = Color.YELLOW;
+
+    /**
+     * Alignments
+     */
+    public static final Paint.Align LEFT_ALIGN = Paint.Align.LEFT;
+    public static final Paint.Align CENTER_ALIGN = Paint.Align.CENTER;
 
     private static final String HANKEN_BOOK_FONT = "Hanken-Book.ttf";
 
     private final Typeface NORMAL_FONT;
-    private final Typeface BOLD_FONT;
 
     private Paint paint = new Paint();
     private Canvas canvas;
@@ -43,7 +49,6 @@ public class DrawingHelper {
      */
     public DrawingHelper(Context context, SurfaceHolder surfaceHolder) {
         NORMAL_FONT = Typeface.createFromAsset(context.getAssets(), HANKEN_BOOK_FONT);
-        BOLD_FONT = Typeface.create(NORMAL_FONT, Typeface.BOLD);
         paint.setTypeface(NORMAL_FONT);
         this.surfaceHolder = surfaceHolder;
         if (readyToDraw()) {
@@ -139,8 +144,8 @@ public class DrawingHelper {
     public void drawScoreAndLevel(int points, int level, int fontSize, int x, int y) {
         paint.setColor(Color.BLACK);
         paint.setTextSize(fontSize);
-        paint.setTypeface(BOLD_FONT);
         paint.setTextAlign(Paint.Align.LEFT);
+        paint.setFakeBoldText(true);
         canvas.drawText("SCORE: " + points + "  LEVEL: " + level, x, y, paint);
     }
 
@@ -154,12 +159,28 @@ public class DrawingHelper {
      * @param color of the text.
      */
     public void drawBoldText(String text, int fontSize, int x, int y, int color) {
-        paint.setTypeface(BOLD_FONT);
         paint.setColor(color);
         paint.setTextSize(fontSize);
-        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextAlign(CENTER_ALIGN);
         paint.setStyle(Paint.Style.FILL);
         paint.setFakeBoldText(true);
+        canvas.drawText(text, x, y, paint);    }
+
+    /**
+     * Draws text in a regular typeface. (Left aligned)
+     *
+     * @param text to draw.
+     * @param fontSize of the text.
+     * @param x coordinate.
+     * @param y coordinate.
+     * @param color of the text.
+     */
+    public void drawRegularText(String text, int fontSize, int x, int y, int color) {
+        paint.setColor(color);
+        paint.setTextSize(fontSize);
+        paint.setTextAlign(LEFT_ALIGN);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setFakeBoldText(false);
         canvas.drawText(text, x, y, paint);
     }
 

@@ -1,5 +1,6 @@
 package com.coryswainston.game.helpers;
 
+import android.graphics.Color;
 import android.graphics.Point;
 
 import com.coryswainston.game.objects.Hoorah;
@@ -52,6 +53,7 @@ public class HoorahManager {
         hoorah.setDuration(duration);
         hoorah.setSize(getIntFromFontSize(size));
         hoorah.setText(text);
+        hoorah.setAlpha(255);
 
         hoorahs.add(hoorah);
     }
@@ -61,7 +63,7 @@ public class HoorahManager {
 
         for (Hoorah hoorah : hoorahs) {
             drawingHelper.drawBoldText(hoorah.getText(), hoorah.getSize(), hoorah.getPosition().x,
-                    hoorah.getPosition().y, DrawingHelper.DARK_RED);
+                    hoorah.getPosition().y, getColorWithFade(hoorah));
 
             hoorah.getPosition().offset(0, -bounds.y / 500);
 
@@ -72,5 +74,17 @@ public class HoorahManager {
         }
 
         hoorahs.removeAll(toRemove);
+    }
+
+    private int getColorWithFade(Hoorah hoorah) {
+        boolean threeQuarterMark = hoorah.getDuration() / 4 >= hoorah.getFramesLeft();
+        if (threeQuarterMark) {
+            int dAlpha = 255 / (hoorah.getDuration() / 4);
+            hoorah.fade(dAlpha);
+            if (hoorah.getAlpha() < 0) {
+                hoorah.setAlpha(0);
+            }
+        }
+        return Color.argb(hoorah.getAlpha(), 180, 0, 0);
     }
 }

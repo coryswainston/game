@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,6 +17,7 @@ import android.view.View;
 
 import com.coryswainston.game.activities.GameActivity;
 import com.coryswainston.game.activities.MainActivity;
+import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.ViewListener;
 import com.coryswainston.game.objects.Llama;
 
@@ -29,42 +31,48 @@ public class MenuView extends SurfaceView implements Runnable{
     private ViewListener viewListener;
     volatile boolean running = false;
 
+    private int flashAlpha;
+    private boolean flashSwitch;
+
     public MenuView(Context context){
         super(context);
         this.context = context;
+
+        flashAlpha = 255;
+        flashSwitch = false;
     }
 
-    public void draw(){
-        SurfaceHolder surfaceHolder = getHolder();
-        if(surfaceHolder.getSurface().isValid()){
-            Canvas canvas = surfaceHolder.lockCanvas();
-            Paint paint = new Paint();
+    public void draw() {
+        Point bounds = new Point();
+        ((Activity)context).getWindowManager().getDefaultDisplay().getSize(bounds);
 
-            Point bounds = new Point();
-            ((Activity)context).getWindowManager().getDefaultDisplay().getSize(bounds);
-
+        DrawingHelper drawingHelper = new DrawingHelper(context, getHolder());
+        if (drawingHelper.readyToDraw()) {
             Llama llama = new Llama(context, bounds.x / 6, bounds.x / 6);
             llama.setY(bounds.y / 2.3f);
             llama.setX(bounds.x * 3 / 4);
 
-            canvas.drawColor(Color.WHITE);
-            canvas.drawBitmap(llama.getBitmap(), llama.getX(), llama.getY(), paint);
-            paint.setColor(Color.BLUE);
-            paint.setTextSize(300);
-            paint.setTextAlign(Paint.Align.LEFT);
-            paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "Hanken-Book.ttf"));
-            canvas.drawText("LLAMA", bounds.x / 8, bounds.y / 2.3f, paint);
-            canvas.drawText("LLAND", bounds.x / 8, bounds.y / 2.3f + 350, paint);
-            paint.setTextSize(80);
-            paint.setColor(Color.rgb(0, 100, 0));
-            canvas.drawText("Tap to play", bounds.x / 2, bounds.y /2 + 680, paint);
+            drawingHelper.fillBackground(Color.WHITE);
+            drawingHelper.draw(llama);
+            drawingHelper.drawRegularText("LLAMA", bounds.y / 4, bounds.y / 6,
+                                        bounds.y * 3 / 8, DrawingHelper.BLUE);
+            drawingHelper.drawRegularText("LLAND", bounds.y / 4, bounds.y / 6,
+                                        bounds.y * 11 / 16, DrawingHelper.BLUE);
+            drawingHelper.drawRegularText("Tap to play", bounds.y / 12, bounds.y / 6,
+                                        bounds.y * 7/ 8, Color.argb(flashAlpha, 0, 100, 0));
 
-            surfaceHolder.unlockCanvasAndPost(canvas);
+            drawingHelper.finish();
         }
     }
 
     public void update() {
-        // empty
+        flashAlpha += flashSwitch ? 10 : -15;
+        if (flashAlpha == 105) {
+            flashSwitch = true;
+        }
+        if (flashAlpha == 255) {
+            flashSwitch = false;
+        }
     }
 
     private void control(long frameTime){

@@ -18,11 +18,13 @@ public class Hoorah {
     private int size;
     private int duration;
     private String text;
+    private int alpha;
+    private int framesLeft;
 
     public boolean countdown() {
-        duration--;
+        framesLeft--;
 
-        return duration != 0;
+        return framesLeft != 0;
     }
 
     public Point getPosition() {
@@ -47,6 +49,11 @@ public class Hoorah {
 
     public void setDuration(int duration) {
         this.duration = duration;
+        framesLeft = duration;
+    }
+
+    public int getFramesLeft() {
+        return framesLeft;
     }
 
     public String getText() {
@@ -55,6 +62,18 @@ public class Hoorah {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public int getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(int alpha) {
+        this.alpha = alpha;
+    }
+
+    public void fade(int dAlpha) {
+        alpha -= dAlpha;
     }
 
     // TODO implement to take drawText() params and an optional background
