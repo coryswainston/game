@@ -52,7 +52,7 @@ public class MenuView extends SurfaceView implements Runnable{
             paint.setColor(Color.BLUE);
             paint.setTextSize(300);
             paint.setTextAlign(Paint.Align.LEFT);
-            paint.setTypeface(Typeface.createFromAsset(context.getAssets(), MainActivity.HANKEN_BOOK_FONT));
+            paint.setTypeface(Typeface.createFromAsset(context.getAssets(), "Hanken-Book.ttf"));
             canvas.drawText("LLAMA", bounds.x / 8, bounds.y / 2.3f, paint);
             canvas.drawText("LLAND", bounds.x / 8, bounds.y / 2.3f + 350, paint);
             paint.setTextSize(80);

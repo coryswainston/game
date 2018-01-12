@@ -53,11 +53,19 @@ public class Llama extends Sprite {
             dy = 0;
         }
         for (int i = 0; i < sheepPile.size(); i++) {
-            sheepPile.get(i).setDx(0);
-            sheepPile.get(i).setDy(0);
-            sheepPile.get(i).setX(x);
-            int sheepHeight = (int)Math.round(sheepPile.get(i).getHeight() * EIGHTY_PERCENT);
-            sheepPile.get(i).setY(y - sheepHeight - sheepHeight * i);
+            Sheep sheep = sheepPile.get(i);
+            int sheepHeight = (int)Math.round(sheep.getHeight() * EIGHTY_PERCENT);
+            sheep.setX(x);
+            final int sheepVelocity = 40;
+            float targetY = y - height / 4 - sheepHeight * i;
+            if (sheep.getY() != targetY) {
+                if (sheep.getY() - targetY > sheepVelocity) {
+                    sheep.setY(sheep.getY() - sheepVelocity);
+                } else {
+                    sheep.setY(targetY);
+                    sheep.setSeated(true);
+                }
+            }
         }
 
         duckTimer += ducking ? 1 : 0;
@@ -81,6 +89,16 @@ public class Llama extends Sprite {
 
     public void addToPile(Sheep sheep) {
         sheepPile.add(sheep);
+    }
+
+    public int getPileSize() {
+        int size = 0;
+        for (Sheep sheep : sheepPile) {
+            if (sheep.isSeated()) {
+                size++;
+            }
+        }
+        return size;
     }
 
     public void setFloor(int yFloor){ this.yFloor = yFloor; }

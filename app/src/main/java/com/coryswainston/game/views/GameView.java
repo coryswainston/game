@@ -205,7 +205,7 @@ public class GameView extends SurfaceView implements Runnable {
      * Move everything along
      */
     private void update(){
-        if (llama.getSheepPile().size() == numberOfSheep) {
+        if (llama.getPileSize() == numberOfSheep) {
             playing = false;
             gameWon = true;
         }
@@ -353,8 +353,9 @@ public class GameView extends SurfaceView implements Runnable {
 
         drawingHelper.draw(clouds);
         drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
+        drawingHelper.draw(llama.getSheepPile());
         drawingHelper.draw(llama);
-        drawingHelper.draw(llama.getSheepPile(), sheeps, comets);
+        drawingHelper.draw(sheeps, comets);
 
         hoorahManager.drawHoorahs(drawingHelper);
 
