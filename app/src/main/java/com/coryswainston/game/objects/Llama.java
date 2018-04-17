@@ -3,7 +3,7 @@ package com.coryswainston.game.objects;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
+import android.graphics.Rect;
 
 import com.coryswainston.game.R;
 
@@ -14,16 +14,15 @@ import java.util.List;
  * @author Cory Swainston
  */
 
-public class Llama extends Sprite {
+public class Llama extends Sprite implements Hittable {
 
-    private int yFloor;
-    private int yCeiling;
+    private int floor;
     private boolean ducking;
+
     private int duckTimer;
     private List<Sheep> sheepPile = new ArrayList<>();
 
     private final int GRAVITY = 5;
-    private final double EIGHTY_PERCENT = .8;
 
     public Llama(Context context, int height, int width){
         this.context = context;
@@ -32,7 +31,6 @@ public class Llama extends Sprite {
         dx = 0;
         dy = 0;
         alive = true;
-        yCeiling = 400;
         initializeBitmaps();
         setSize(width, height);
         duckTimer = 0;
@@ -42,19 +40,17 @@ public class Llama extends Sprite {
     public void update(){
         x += dx;
         y += dy;
-        if (y < yFloor){
+        if (y < floor){
             dy += GRAVITY;
         }
-        if (y < (yFloor - yCeiling) && dy < 0){
-            dy = -dy;
-        }
-        if (y >= yFloor){
-            y = yFloor;
+        if (y >= floor){
+            y = floor;
             dy = 0;
         }
+
         for (int i = 0; i < sheepPile.size(); i++) {
             Sheep sheep = sheepPile.get(i);
-            int sheepHeight = (int)Math.round(sheep.getHeight() * EIGHTY_PERCENT);
+            int sheepHeight = (int)Math.round(sheep.getHeight() * .8);
             sheep.setX(x);
             final int sheepVelocity = 40;
             float targetY = y - height / 4 - sheepHeight * i;
@@ -75,8 +71,17 @@ public class Llama extends Sprite {
         }
     }
 
+    @Override
+    public Rect getHitRect() {
+        return new Rect(
+                getX() + width / 8,
+                getY() + height / 3,
+                getX() + width * 7 / 8,
+                getY() + height);
+    }
+
     public void jump() {
-        setDy((int)(-yCeiling / 6.5));
+        setDy(-height / 4);
     }
 
     public void duck() {
@@ -101,9 +106,7 @@ public class Llama extends Sprite {
         return size;
     }
 
-    public void setFloor(int yFloor){ this.yFloor = yFloor; }
-
-    public void setCeiling(int yCeiling) { this.yCeiling = yCeiling; }
+    public void setFloor(int floor){ this.floor = floor; }
 
     public void turnLeft(){ bitmapIdx = 1; }
 

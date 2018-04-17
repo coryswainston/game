@@ -3,6 +3,7 @@ package com.coryswainston.game.objects;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 
 import com.coryswainston.game.R;
 
@@ -12,7 +13,7 @@ import com.coryswainston.game.R;
  * @author Cory Swainston
  */
 
-public class Comet extends Sprite {
+public class Comet extends Sprite implements Hittable {
 
     private int frameCtr;
     private boolean exploded;
@@ -30,6 +31,7 @@ public class Comet extends Sprite {
         bitmaps[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet3);
     }
 
+    @Override
     public void update(){
         x += dx;
         y += dy;
@@ -38,6 +40,11 @@ public class Comet extends Sprite {
             toggleBitmap();
             frameCtr = 0;
         }
+    }
+
+    @Override
+    public Rect getHitRect() {
+        return new Rect(getX(), getY(), getX() + width, getY() + height);
     }
 
     private void toggleBitmap(){

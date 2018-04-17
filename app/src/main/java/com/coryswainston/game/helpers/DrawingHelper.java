@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.view.SurfaceHolder;
 
 import com.coryswainston.game.activities.MainActivity;
+import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sprite;
 
 import java.util.Collection;

@@ -20,6 +20,7 @@ import com.coryswainston.game.objects.Comet;
 import com.coryswainston.game.objects.Hoorah;
 import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sheep;
+import com.coryswainston.game.objects.Sprite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -108,7 +109,6 @@ public class GameView extends SurfaceView implements Runnable {
         llama.setX(10);
         llama.setY(yFloor - llama.getHeight());
         llama.setFloor(llama.getY());
-        llama.setCeiling(bounds.y / 5);
     }
 
     private void setUpBoundaries() {
@@ -218,6 +218,10 @@ public class GameView extends SurfaceView implements Runnable {
         updateHighScore();
     }
 
+    private void shrinkInHalf(Sprite sprite) {
+        sprite.setSize((int)Math.round(sprite.getWidth() / 2.0), (int)Math.round(sprite.getHeight() / 2.0));
+    }
+
     private void updateHighScore() {
         if (!playing && points > highScore){
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -286,12 +290,9 @@ public class GameView extends SurfaceView implements Runnable {
         return newComet;
     }
 
-    private void detectCollisions(){
-        Point llamaCenter = new Point(llama.getX() + llama.getWidth() / 2, llama.getY() + llama.getHeight() / 3);
+    private void detectCollisions() {
         for(Comet comet : comets){
-            Point cometCenter = new Point(comet.getX() + comet.getWidth() / 2, comet.getY() + comet.getHeight());
-            if (Math.abs(cometCenter.x - llamaCenter.x) < llama.getWidth() / 2.1 + comet.getWidth() / 2 &&
-                    cometCenter.y - llamaCenter.y >= 0){
+            if (comet.getHitRect().intersect(llama.getHitRect())) {
                 comet.explode();
                 playing = false;
                 llama.kill();
@@ -300,12 +301,12 @@ public class GameView extends SurfaceView implements Runnable {
             allSheeps.addAll(sheeps);
             allSheeps.addAll(llama.getSheepPile());
             for (Sheep sheep : allSheeps) {
-                Point sheepCenter = new Point(sheep.getX() + sheep.getWidth() / 2, sheep.getY());
-                if (Math.abs(cometCenter.x - sheepCenter.x) < sheep.getWidth() / 2.1 + sheep.getWidth() / 2 &&
-                        cometCenter.y - sheepCenter.y >= 0) {
+                if (sheep.getHitRect().intersect(comet.getHitRect())) {
                     if (!sheep.isBurnt()) {
                         points -= 50;
-                        hoorahManager.makeHoorah(cometCenter, HoorahManager.FontSize.SMALL, Hoorah.TIME_MED,
+                        hoorahManager.makeHoorah(new Point(comet.getX(), comet.getY()),
+                                HoorahManager.FontSize.SMALL,
+                                Hoorah.TIME_MED,
                                 "-50");
                         sheep.setBurnt(true);
                     }
@@ -315,7 +316,7 @@ public class GameView extends SurfaceView implements Runnable {
         for(Iterator<Sheep> it = sheeps.iterator(); it.hasNext();) {
             Sheep sheep = it.next();
             Point sheepCenter = new Point(sheep.getX() + sheep.getWidth() / 2, sheep.getY());
-            if (Math.abs(llamaCenter.x - sheepCenter.x) < 100 && llama.isDucking()) {
+            if (llama.getHitRect().intersect(sheep.getHitRect()) && llama.isDucking()) {
                 it.remove();
                 llama.addToPile(sheep);
                 points += 100;

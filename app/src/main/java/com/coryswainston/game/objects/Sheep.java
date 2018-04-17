@@ -3,19 +3,19 @@ package com.coryswainston.game.objects;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 
 import com.coryswainston.game.R;
-import com.coryswainston.game.objects.Sprite;
 
 /**
  * @author Cory Swainston
  */
 
-public class Sheep extends Sprite {
+public class Sheep extends Sprite implements Hittable {
 
     private int stepTimer;
-    boolean burnt;
-    boolean seated;
+    private boolean burnt;
+    private boolean seated;
 
     public Sheep(Context context){
         x = y = dy = dx = 0;
@@ -31,15 +31,21 @@ public class Sheep extends Sprite {
         stepTimer = 0;
     }
 
+    @Override
     public void update(){
         x += dx;
         y += dy;
 
-        if (stepTimer == 5){
+        if (stepTimer == 4){
             step();
             stepTimer = 0;
         }
         stepTimer ++;
+    }
+
+    @Override
+    public Rect getHitRect() {
+        return new Rect(getX(), getY(), getX() + width, getY() + height);
     }
 
     public void turnLeft(){
