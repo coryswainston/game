@@ -145,9 +145,11 @@ public class GameView extends SurfaceView implements Runnable {
      * The game loop
      */
     public void run(){
-        while (playing){
+        while (!gameWon && llama.isAlive()){
             long startMillis = System.currentTimeMillis();
-            update();
+            if (playing) {
+                update();
+            }
             draw();
 
             long frameTime = System.currentTimeMillis() - startMillis;
@@ -174,16 +176,23 @@ public class GameView extends SurfaceView implements Runnable {
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
                 if(!playing) {
-                    Log.d("GameView", "Bout to return with score " + points);
-                    Intent intent = new Intent();
-                    intent.putExtra("score", gameWon ? points : 0);
-                    intent.putExtra("continue", gameWon);
-                    getListener().onAction(intent);
+                    if (llama.isAlive() && !gameWon) {
+                        playing = true;
+                    } else {
+                        Log.d("GameView", "Bout to return with score " + points);
+                        Intent intent = new Intent();
+                        intent.putExtra("score", gameWon ? points : 0);
+                        intent.putExtra("continue", gameWon);
+                        getListener().onAction(intent);
+                    }
                 }
 
                 gestureHelper.up(e);
 
                 if (gestureHelper.noSwipe()) {
+                    if (e.getX() > bounds.x - 90 && e.getY() < 90) {
+                        playing = false;
+                    }
                     llama.setDx(0);
                 } else if (gestureHelper.isRightSwipe()){
                     llama.turnRight();
@@ -194,7 +203,6 @@ public class GameView extends SurfaceView implements Runnable {
                 } else if (gestureHelper.isSwipeUp()){
                     llama.jump();
                 } else {
-                    Log.d("Gesture", "Swiped down foo");
                     llama.duck();
                 }
                 return true;
@@ -367,6 +375,8 @@ public class GameView extends SurfaceView implements Runnable {
 
         drawingHelper.draw(clouds);
         drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
+        drawingHelper.drawRectangle(bounds.x - 70, 20, bounds.x - 55, 70, DrawingHelper.BLACK);
+        drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
         drawingHelper.draw(llama.getSheepPile());
         drawingHelper.draw(llama);
         drawingHelper.draw(sheeps, comets);

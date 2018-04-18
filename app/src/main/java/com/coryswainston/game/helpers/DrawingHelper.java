@@ -27,6 +27,7 @@ public class DrawingHelper {
     public static final int WHITE = Color.WHITE;
     public static final int BLUE = Color.BLUE;
     public static final int YELLOW = Color.YELLOW;
+    public static final int BLACK = Color.BLACK;
 
     /**
      * Alignments
