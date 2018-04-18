@@ -257,6 +257,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (random.nextInt(odds) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep
                 && framesSinceLastSheep > 30) {
             newSheep = new Sheep(getContext());
+            framesSinceLastSheep = 0;
         } else {
             framesSinceLastSheep++;
         }
@@ -417,6 +418,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void controlFrameRate(long frameTime){
         long leftoverMillis = TARGET_MILLIS - frameTime;
+        Log.d("GAME VIEW", "Leftover Millis: " + leftoverMillis);
         if (leftoverMillis < 5){
             leftoverMillis = 5;
         }

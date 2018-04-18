@@ -1,6 +1,7 @@
 package com.coryswainston.game.helpers;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -50,8 +51,9 @@ public class DrawingHelper {
      * @param surfaceHolder for view on which to draw.
      */
     public DrawingHelper(Context context, SurfaceHolder surfaceHolder) {
-        VALERA = Typeface.createFromAsset(context.getAssets(), "VarelaRound-Regular.ttf");
-        JUA = Typeface.createFromAsset(context.getAssets(), "Jua-Regular.ttf");
+        AssetManager assets = context.getAssets();
+        VALERA = Typeface.createFromAsset(assets, "VarelaRound-Regular.ttf");
+        JUA = Typeface.createFromAsset(assets, "Jua-Regular.ttf");
         paint.setTypeface(JUA);
         this.surfaceHolder = surfaceHolder;
         if (readyToDraw()) {
