@@ -59,6 +59,7 @@ public class GameView extends SurfaceView implements Runnable {
     private int framesSinceLastComet;
     private int sheepPerMinute;
     private int numberOfSheep;
+    private int framesSinceLastSheep;
 
     int points;
     int level;
@@ -103,6 +104,7 @@ public class GameView extends SurfaceView implements Runnable {
         framesSinceLastComet = 0;
         sheepPerMinute = BASE_PER_MINUTE * 2;
         numberOfSheep = level;
+        framesSinceLastSheep = 0;
     }
 
     private void createLlama() {
@@ -248,10 +250,15 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void updateSheep() {
+        float sheepPerFrame = sheepPerMinute / 60.0f / 30.0f;
+        int odds = (int) (1 / sheepPerFrame);
         Sheep newSheep = null;
         Random random = new Random();
-        if (random.nextInt(sheepPerMinute) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep) {
+        if (random.nextInt(odds) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep
+                && framesSinceLastSheep > 30) {
             newSheep = new Sheep(getContext());
+        } else {
+            framesSinceLastSheep++;
         }
         if (newSheep != null) {
             newSheep.setSize(bounds.y / 6, bounds.y / 9);
