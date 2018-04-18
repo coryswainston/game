@@ -48,7 +48,7 @@ public class MenuView extends SurfaceView implements Runnable{
 
         DrawingHelper drawingHelper = new DrawingHelper(context, getHolder());
         if (drawingHelper.readyToDraw()) {
-            Llama llama = new Llama(context, bounds.x / 6, bounds.x / 6);
+            Llama llama = new Llama(context, bounds.x / 5);
             llama.setY(bounds.y / 2.3f);
             llama.setX(bounds.x * 3 / 4);
 

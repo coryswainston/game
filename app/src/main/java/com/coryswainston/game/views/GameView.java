@@ -106,7 +106,8 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void createLlama() {
-        llama = new Llama(context, bounds.y / 6, bounds.y / 6);
+        int width = bounds.y / 5;
+        llama = new Llama(context, width);
         llama.setX(bounds.x / 2);
         llama.setY(yFloor - llama.getHeight());
         llama.setFloor(llama.getY());
@@ -327,7 +328,7 @@ public class GameView extends SurfaceView implements Runnable {
                                 HoorahManager.FontSize.SMALL,
                                 Hoorah.TIME_MED,
                                 "-50");
-                        sheep.setBurnt(true);
+                        sheep.burn();
                     }
                 }
             }
