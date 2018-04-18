@@ -20,7 +20,6 @@ import com.coryswainston.game.objects.Comet;
 import com.coryswainston.game.objects.Hoorah;
 import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sheep;
-import com.coryswainston.game.objects.Sprite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,6 +34,7 @@ import java.util.Random;
 public class GameView extends SurfaceView implements Runnable {
 
     private final long TARGET_MILLIS = 33;
+    private final int BASE_PER_MINUTE = 20;
     private final String HIGH_SCORE = "high_score";
     private final String LLAMA_PREFS = "llama_prefs";
 
@@ -55,8 +55,9 @@ public class GameView extends SurfaceView implements Runnable {
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
     private final List<Cloud> clouds = new ArrayList<>(3);
-    private int cometFrequency;
-    private int sheepFrequency;
+    private int cometsPerMinute;
+    private int framesSinceLastComet;
+    private int sheepPerMinute;
     private int numberOfSheep;
 
     int points;
@@ -98,9 +99,9 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void initializeGameConditions() {
-        int frequency = 2000 / (20 + level);
-        cometFrequency = frequency;
-        sheepFrequency = frequency / 2;
+        cometsPerMinute = BASE_PER_MINUTE + level * 2;
+        framesSinceLastComet = 0;
+        sheepPerMinute = BASE_PER_MINUTE * 2;
         numberOfSheep = level;
     }
 
@@ -218,10 +219,6 @@ public class GameView extends SurfaceView implements Runnable {
         updateHighScore();
     }
 
-    private void shrinkInHalf(Sprite sprite) {
-        sprite.setSize((int)Math.round(sprite.getWidth() / 2.0), (int)Math.round(sprite.getHeight() / 2.0));
-    }
-
     private void updateHighScore() {
         if (!playing && points > highScore){
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -244,7 +241,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void updateSheep() {
         Sheep newSheep = null;
         Random random = new Random();
-        if (random.nextInt(sheepFrequency) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep) {
+        if (random.nextInt(sheepPerMinute) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep) {
             newSheep = new Sheep(getContext());
         }
         if (newSheep != null) {
@@ -262,10 +259,15 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void updateComets(){
+    private void updateComets() {
+        float cometsPerFrame = cometsPerMinute / 60.0f / 30.0f;
+        int odds = (int) (1 / cometsPerFrame);
         Random random = new Random();
-        if (random.nextInt(cometFrequency) == 1 && comets.size() < level + 2) {
+        if ((random.nextInt(odds) == 1 || framesSinceLastComet == odds * 2) && comets.size() < Math.max(level, 2)) {
+            framesSinceLastComet = 0;
             comets.add(getNewComet());
+        } else {
+            framesSinceLastComet++;
         }
         for (Iterator<Comet> it = comets.iterator(); it.hasNext();){
             Comet comet = it.next();
@@ -282,9 +284,17 @@ public class GameView extends SurfaceView implements Runnable {
     private Comet getNewComet() {
         Random random = new Random();
         Comet newComet = new Comet(getContext(), random.nextInt(bounds.x));
-        newComet.setSize(bounds.y / 8, bounds.y / 5);
-        newComet.setDy(bounds.y / 80);
-        newComet.setDx(random.nextInt(bounds.y / 120) - bounds.y / 240);
+        int height = (int) (bounds.y / 5.5);
+        int width = (int) (height * 0.6);
+        newComet.setSize(width, height);
+        int speed = bounds.y / 75;
+        int degrees = random.nextInt(30) - 15;
+        int angle = 90 - degrees;
+        float dx = speed * -(float)(Math.cos((float)Math.PI / 180.0f * angle));
+        float dy = speed * (float)(Math.sin((float)Math.PI / 180.0f * angle));
+        newComet.setDy(dy);
+        newComet.setDx(dx);
+        newComet.rotate(degrees / 3);
         newComet.setY(-newComet.getHeight());
 
         return newComet;
@@ -302,6 +312,7 @@ public class GameView extends SurfaceView implements Runnable {
             allSheeps.addAll(llama.getSheepPile());
             for (Sheep sheep : allSheeps) {
                 if (sheep.getHitRect().intersect(comet.getHitRect())) {
+                    comet.explode();
                     if (!sheep.isBurnt()) {
                         points -= 50;
                         hoorahManager.makeHoorah(new Point(comet.getX(), comet.getY()),
