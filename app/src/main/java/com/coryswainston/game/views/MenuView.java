@@ -54,9 +54,9 @@ public class MenuView extends SurfaceView implements Runnable{
 
             drawingHelper.fillBackground(Color.WHITE);
             drawingHelper.draw(llama);
-            drawingHelper.drawRegularText("LLAMA", bounds.y / 4, bounds.y / 6,
+            drawingHelper.drawRegularText("Llama", bounds.y / 4, bounds.y / 6,
                                         bounds.y * 3 / 8, DrawingHelper.BLUE);
-            drawingHelper.drawRegularText("LLAND", bounds.y / 4, bounds.y / 6,
+            drawingHelper.drawRegularText("Lland", bounds.y / 4, bounds.y / 6,
                                         bounds.y * 11 / 16, DrawingHelper.BLUE);
             drawingHelper.drawRegularText("Tap to play", bounds.y / 12, bounds.y / 6,
                                         bounds.y * 7/ 8, Color.argb(flashAlpha, 0, 100, 0));

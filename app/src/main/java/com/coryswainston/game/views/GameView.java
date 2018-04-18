@@ -403,12 +403,12 @@ public class GameView extends SurfaceView implements Runnable {
             if (llama.isAlive()) {
                 messageText = gameWon ? "YOU WIN!" : "PAUSED";
             }
-            drawingHelper.drawBoldText(messageText, fontSize, xTextPosition, yTextPosition,
+            drawingHelper.drawCenterText(messageText, fontSize, xTextPosition, yTextPosition,
                     DrawingHelper.BLUE);
-            drawingHelper.drawBoldText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
+            drawingHelper.drawCenterText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
                     newHigh ? fontSize / 2 : fontSize, xTextPosition, yTextPosition + fontSize + 50,
                     DrawingHelper.DARK_GREEN);
-            drawingHelper.drawBoldText("Tap to continue", bounds.y / 12, xTextPosition,
+            drawingHelper.drawCenterText("Tap to continue", bounds.y / 12, xTextPosition,
                     bounds.y * 3/4, DrawingHelper.DARK_RED);
         }
 

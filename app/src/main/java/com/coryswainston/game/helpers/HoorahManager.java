@@ -62,7 +62,7 @@ public class HoorahManager {
         List<Hoorah> toRemove = new ArrayList<>();
 
         for (Hoorah hoorah : hoorahs) {
-            drawingHelper.drawBoldText(hoorah.getText(), hoorah.getSize(), hoorah.getPosition().x,
+            drawingHelper.drawCenterText(hoorah.getText(), hoorah.getSize(), hoorah.getPosition().x,
                     hoorah.getPosition().y, getColorWithFade(hoorah));
 
             hoorah.getPosition().offset(0, -bounds.y / 500);

@@ -11,6 +11,7 @@ import com.coryswainston.game.activities.MainActivity;
 import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sprite;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
@@ -35,9 +36,8 @@ public class DrawingHelper {
     public static final Paint.Align LEFT_ALIGN = Paint.Align.LEFT;
     public static final Paint.Align CENTER_ALIGN = Paint.Align.CENTER;
 
-    private static final String HANKEN_BOOK_FONT = "Hanken-Book.ttf";
-
-    private final Typeface NORMAL_FONT;
+    private final Typeface VALERA;
+    private final Typeface JUA;
 
     private Paint paint = new Paint();
     private Canvas canvas;
@@ -50,8 +50,9 @@ public class DrawingHelper {
      * @param surfaceHolder for view on which to draw.
      */
     public DrawingHelper(Context context, SurfaceHolder surfaceHolder) {
-        NORMAL_FONT = Typeface.createFromAsset(context.getAssets(), HANKEN_BOOK_FONT);
-        paint.setTypeface(NORMAL_FONT);
+        VALERA = Typeface.createFromAsset(context.getAssets(), "VarelaRound-Regular.ttf");
+        JUA = Typeface.createFromAsset(context.getAssets(), "Jua-Regular.ttf");
+        paint.setTypeface(JUA);
         this.surfaceHolder = surfaceHolder;
         if (readyToDraw()) {
             canvas = surfaceHolder.lockCanvas();
@@ -147,12 +148,12 @@ public class DrawingHelper {
         paint.setColor(Color.BLACK);
         paint.setTextSize(fontSize);
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.setFakeBoldText(true);
+        paint.setTypeface(VALERA);
         canvas.drawText("SCORE: " + points + "  LEVEL: " + level, x, y, paint);
     }
 
     /**
-     * Draws text in a bold typeface.
+     * Draws centered text.
      *
      * @param text to draw.
      * @param fontSize of the text.
@@ -160,12 +161,12 @@ public class DrawingHelper {
      * @param y coordinate.
      * @param color of the text.
      */
-    public void drawBoldText(String text, int fontSize, int x, int y, int color) {
+    public void drawCenterText(String text, int fontSize, int x, int y, int color) {
         paint.setColor(color);
         paint.setTextSize(fontSize);
         paint.setTextAlign(CENTER_ALIGN);
         paint.setStyle(Paint.Style.FILL);
-        paint.setFakeBoldText(true);
+        paint.setTypeface(JUA);
         canvas.drawText(text, x, y, paint);    }
 
     /**
@@ -182,7 +183,7 @@ public class DrawingHelper {
         paint.setTextSize(fontSize);
         paint.setTextAlign(LEFT_ALIGN);
         paint.setStyle(Paint.Style.FILL);
-        paint.setFakeBoldText(false);
+        paint.setTypeface(VALERA);
         canvas.drawText(text, x, y, paint);
     }
 
