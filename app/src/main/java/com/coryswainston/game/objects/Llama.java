@@ -86,8 +86,10 @@ public class Llama extends Sprite implements Hittable {
     }
 
     public void jump() {
-        setDy(-height / 4);
-        drawableIdx = facingRight() ? 4 : 5;
+        if (y == floor) {
+            setDy(-height / 4);
+            drawableIdx = facingRight() ? 4 : 5;
+        }
     }
 
     public void duck() {
