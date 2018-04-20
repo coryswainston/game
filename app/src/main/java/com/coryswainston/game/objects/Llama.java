@@ -117,6 +117,10 @@ public class Llama extends Sprite implements Hittable {
         return size;
     }
 
+    public int getFloor() {
+        return floor;
+    }
+
     public void setFloor(int floor){ this.floor = floor; }
 
     public void turnLeft(){
@@ -145,7 +149,7 @@ public class Llama extends Sprite implements Hittable {
         drawables[5] = res.getDrawable(R.drawable.llama_jump2);
     }
 
-    private boolean facingRight() {
+    public boolean facingRight() {
         return drawableIdx % 2 == 0;
     }
 }

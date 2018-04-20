@@ -2,10 +2,14 @@ package com.coryswainston.game.helpers;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.view.SurfaceHolder;
 
 import com.coryswainston.game.objects.Sprite;
@@ -27,6 +31,7 @@ public class DrawingHelper {
     public static final int BLUE = Color.BLUE;
     public static final int YELLOW = Color.YELLOW;
     public static final int BLACK = Color.BLACK;
+    public static final int GREY = Color.argb(100, 60, 60, 60);
 
     /**
      * Alignments
@@ -74,6 +79,11 @@ public class DrawingHelper {
      */
     public void fillBackground(int color) {
         canvas.drawColor(color);
+    }
+
+    public void drawWatermark(Bitmap b) {
+        paint.setAlpha(80);
+        canvas.drawBitmap(b, 0, 0, paint);
     }
 
     /**
@@ -142,6 +152,25 @@ public class DrawingHelper {
     public void drawRectangle(int left, int top, int right, int bottom, int color) {
         paint.setColor(color);
         canvas.drawRect(left, top, right, bottom, paint);
+    }
+
+    /**
+     * Draws an oval.
+     *
+     * @param left boundary.
+     * @param top "
+     * @param right "
+     * @param bottom "
+     * @param color of the oval.
+     */
+    public void drawOval(int left, int top, int right, int bottom, int color) {
+        paint.setColor(color);
+        RectF r = new RectF();
+        r.left = left;
+        r.top = top;
+        r.right = right;
+        r.bottom = bottom;
+        canvas.drawOval(r, paint);
     }
 
     /**
