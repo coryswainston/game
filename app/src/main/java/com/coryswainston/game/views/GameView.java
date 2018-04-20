@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.media.SoundPool;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.GestureHelper;
@@ -47,7 +49,7 @@ public class GameView extends SurfaceView implements Runnable {
     private HoorahManager hoorahManager;
 
     private Context context;
-    private ViewListener viewListener;
+    private ViewListener finishListener;
     private SoundPool soundPool;
     private SharedPreferences sharedPreferences;
 
@@ -149,13 +151,13 @@ public class GameView extends SurfaceView implements Runnable {
      */
     public void run(){
         while (!gameWon && llama.isAlive()){
-            long startMillis = System.currentTimeMillis();
+            long startMillis = System.nanoTime() / 1000000;
             if (playing) {
                 update();
             }
             draw();
 
-            long frameTime = System.currentTimeMillis() - startMillis;
+            long frameTime = (System.nanoTime() / 1000000) - startMillis;
             controlFrameRate(frameTime);
         }
     }
@@ -181,12 +183,13 @@ public class GameView extends SurfaceView implements Runnable {
                 if(!playing) {
                     if (llama.isAlive() && !gameWon) {
                         playing = true;
+                        return super.onTouchEvent(e);
                     } else {
                         Log.d("GameView", "Bout to return with score " + points);
                         Intent intent = new Intent();
                         intent.putExtra("score", gameWon ? points : 0);
                         intent.putExtra("continue", gameWon);
-                        getListener().onAction(intent);
+                        getFinishListener().onAction(intent);
                     }
                 }
 
@@ -444,15 +447,23 @@ public class GameView extends SurfaceView implements Runnable {
         gameThread.start();
     }
 
-    public void setListener(ViewListener listener) {
-        this.viewListener = listener;
+    public void setFinishListener(ViewListener listener) {
+        this.finishListener = listener;
     }
 
-    public ViewListener getListener() {
-        if (viewListener == null) {
+    public ViewListener getFinishListener() {
+        if (finishListener == null) {
             throw new IllegalStateException("Listener is null!");
         } else {
-            return viewListener;
+            return finishListener;
         }
+    }
+
+    public Bundle getStateVars() {
+        Bundle data = new Bundle();
+        data.putInt("score", points);
+        data.putInt("level", level);
+
+        return data;
     }
 }

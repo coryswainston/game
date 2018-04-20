@@ -1,7 +1,6 @@
 package com.coryswainston.game.activities;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
@@ -24,13 +23,20 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
-        int score = getIntent().getIntExtra(SCORE, 0);
-        int level = getIntent().getIntExtra(LEVEL, 1);
+        int score;
+        int level;
+
+        if (savedInstanceState != null) {
+            score = savedInstanceState.getInt(SCORE, getIntent().getIntExtra(SCORE, 0));
+            level = savedInstanceState.getInt(LEVEL, getIntent().getIntExtra(LEVEL, 1));
+        } else {
+            score = getIntent().getIntExtra(SCORE, 0);
+            level = getIntent().getIntExtra(LEVEL, 1);
+        }
 
         gameView = new GameView(this, score, level);
-        gameView.setListener(new ViewListener() {
+        gameView.setFinishListener(new ViewListener() {
             @Override
             public void onAction(Intent data) {
                 Log.d("GameActivity", "Listener triggered. Caling onLevelFinishedOrGameOver");
@@ -53,10 +59,21 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putAll(gameView.getStateVars());
+    }
+
+    @Override
     protected void onResume(){
         super.onResume();
         gameView.resume();
         mediaPlayer.start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mediaPlayer.release();
     }
 
     @Override

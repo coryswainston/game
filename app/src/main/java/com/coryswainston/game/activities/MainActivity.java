@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         menuView = new MenuView(this);
         menuView.setViewListener(new ViewListener() {
             @Override
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("MainActivity", "returned with result '" + resultCode + "' and data '" +
-                data.toString() + "'");
+                (data != null ? data.toString() : "no data...") + "'");
         if (requestCode == resultCode) {
             startLevel(data);
         } else {
