@@ -1,8 +1,7 @@
 package com.coryswainston.game.objects;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 
 import com.coryswainston.game.R;
 
@@ -12,9 +11,9 @@ import com.coryswainston.game.R;
 
 public class Cloud extends Sprite {
     public Cloud(Context context){
-        bitmaps = new Bitmap[1];
-        bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.cloud);
-        bitmapIdx = 0;
+        drawables = new Drawable[1];
+        drawables[0] = context.getResources().getDrawable(R.drawable.cloud);
+        drawableIdx = 0;
     }
 
     public void update(){

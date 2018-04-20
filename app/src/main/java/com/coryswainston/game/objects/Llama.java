@@ -2,9 +2,8 @@ package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 
 import com.coryswainston.game.R;
 
@@ -32,7 +31,7 @@ public class Llama extends Sprite implements Hittable {
         dx = 0;
         dy = 0;
         alive = true;
-        initializeBitmaps();
+        initializeDrawables();
         int height = width * 9 / 10;
         setSize(width, height);
         duckTimer = 0;
@@ -48,15 +47,15 @@ public class Llama extends Sprite implements Hittable {
         if (y >= floor){
             y = floor;
             dy = 0;
-            if (bitmapIdx >= 4) {
-                bitmapIdx -= 4;
+            if (drawableIdx >= 4) {
+                drawableIdx -= 4;
             }
         }
 
         for (int i = 0; i < sheepPile.size(); i++) {
             Sheep sheep = sheepPile.get(i);
             int sheepHeight = (int)Math.round(sheep.getHeight() * .8);
-            sheep.setX(bitmapIdx % 2 == 0 ? x : x + width / 5);
+            sheep.setX(drawableIdx % 2 == 0 ? x : x + width / 5);
             final int sheepVelocity = 40;
             float targetY = y - height / 4 - sheepHeight * i;
             if (sheep.getY() != targetY) {
@@ -73,7 +72,7 @@ public class Llama extends Sprite implements Hittable {
         if (duckTimer == 5) {
             ducking = false;
             duckTimer = 0;
-            bitmapIdx = facingRight() ? 0 : 1;
+            drawableIdx = facingRight() ? 0 : 1;
         }
     }
 
@@ -88,13 +87,13 @@ public class Llama extends Sprite implements Hittable {
 
     public void jump() {
         setDy(-height / 4);
-        bitmapIdx = facingRight() ? 4 : 5;
+        drawableIdx = facingRight() ? 4 : 5;
     }
 
     public void duck() {
         ducking = true;
-        if (bitmapIdx < 2) {
-            bitmapIdx += 2;
+        if (drawableIdx < 2) {
+            drawableIdx += 2;
         }
     }
 
@@ -120,31 +119,31 @@ public class Llama extends Sprite implements Hittable {
 
     public void turnLeft(){
         if (facingRight()) {
-            bitmapIdx++;
+            drawableIdx++;
         }
     }
 
     public void turnRight() {
         if (!facingRight()) {
-            bitmapIdx--;
+            drawableIdx--;
         }
     }
 
     public boolean isDucking(){return ducking;}
 
-    private void initializeBitmaps() {
+    private void initializeDrawables() {
         Resources res = context.getResources();
-        bitmapIdx = 0;
-        bitmaps = new Bitmap[6];
-        bitmaps[0] = BitmapFactory.decodeResource(res, R.drawable.llama1);
-        bitmaps[1] = BitmapFactory.decodeResource(res, R.drawable.llama2);
-        bitmaps[2] = BitmapFactory.decodeResource(res, R.drawable.llama_duck1);
-        bitmaps[3] = BitmapFactory.decodeResource(res, R.drawable.llama_duck2);
-        bitmaps[4] = BitmapFactory.decodeResource(res, R.drawable.llama_jump1);
-        bitmaps[5] = BitmapFactory.decodeResource(res, R.drawable.llama_jump2);
+        drawableIdx = 0;
+        drawables = new Drawable[6];
+        drawables[0] = res.getDrawable(R.drawable.llama1);
+        drawables[1] = res.getDrawable(R.drawable.llama2);
+        drawables[2] = res.getDrawable(R.drawable.llama_duck1);
+        drawables[3] = res.getDrawable(R.drawable.llama_duck2);
+        drawables[4] = res.getDrawable(R.drawable.llama_jump1);
+        drawables[5] = res.getDrawable(R.drawable.llama_jump2);
     }
 
     private boolean facingRight() {
-        return bitmapIdx % 2 == 0;
+        return drawableIdx % 2 == 0;
     }
 }

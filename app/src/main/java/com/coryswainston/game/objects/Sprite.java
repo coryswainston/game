@@ -2,6 +2,7 @@ package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 /**
  * @author Cory Swainston
@@ -9,21 +10,22 @@ import android.graphics.Bitmap;
 
 public abstract class Sprite {
 
-    protected Bitmap[] bitmaps;
+    protected Drawable[] drawables;
     protected float x;
     protected float y;
     protected float dx;
     protected float dy;
-    protected int bitmapIdx;
+    protected int drawableIdx;
     protected int height;
     protected int width;
     protected boolean alive;
     protected Context context;
+    protected int rotation;
 
     public abstract void update();
 
-    public Bitmap getBitmap(){
-        return bitmaps[bitmapIdx];
+    public Drawable getDrawable(){
+        return drawables[drawableIdx];
     }
 
     public int getX() {
@@ -55,9 +57,6 @@ public abstract class Sprite {
     public void addDy(float ddy) { dy += ddy; }
 
     public void setSize(int width, int height) {
-        for (int i = 0; i < bitmaps.length; i++){
-            bitmaps[i] = Bitmap.createScaledBitmap(bitmaps[i], width, height, false);
-        }
         this.width = width;
         this.height = height;
     }
@@ -69,4 +68,12 @@ public abstract class Sprite {
     public void kill(){alive = false;}
 
     public boolean isAlive(){return alive;}
+
+    public int getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(int rotation) {
+        this.rotation = rotation;
+    }
 }

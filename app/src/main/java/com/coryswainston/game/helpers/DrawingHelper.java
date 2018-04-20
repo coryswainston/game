@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.coryswainston.game.activities.MainActivity;
@@ -85,7 +87,17 @@ public class DrawingHelper {
      * @param sprite to draw.
      */
     public void draw(Sprite sprite) {
-        canvas.drawBitmap(sprite.getBitmap(), sprite.getX(), sprite.getY(), paint);
+        sprite.getDrawable().setBounds(sprite.getX(), sprite.getY(),
+                sprite.getX() + sprite.getWidth(),
+                sprite.getY() + sprite.getHeight());
+        if (sprite.getRotation() != 0) {
+            canvas.save();
+            canvas.rotate(sprite.getRotation(), sprite.getX(), sprite.getY());
+        }
+        sprite.getDrawable().draw(canvas);
+        if (sprite.getRotation() != 0) {
+            canvas.restore();
+        }
     }
 
     /**

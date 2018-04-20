@@ -1,10 +1,11 @@
 package com.coryswainston.game.objects;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.res.Resources;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.coryswainston.game.R;
 
@@ -26,10 +27,12 @@ public class Comet extends Sprite implements Hittable {
         alive = true;
         exploded = false;
 
-        bitmaps = new Bitmap[3];
-        bitmaps[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet1);
-        bitmaps[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet2);
-        bitmaps[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.comet3);
+        Resources res = context.getResources();
+
+        drawables = new Drawable[3];
+        drawables[0] = res.getDrawable(R.drawable.comet1);
+        drawables[1] = res.getDrawable(R.drawable.comet2);
+        drawables[2] = res.getDrawable(R.drawable.comet3);;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class Comet extends Sprite implements Hittable {
         y += dy;
         frameCtr++;
         if (frameCtr == 4) {
-            toggleBitmap();
+            toggleDrawable();
             frameCtr = 0;
         }
     }
@@ -48,30 +51,21 @@ public class Comet extends Sprite implements Hittable {
         return new Rect(getX(), getY(), getX() + width, getY() + height);
     }
 
-    private void toggleBitmap(){
-        if (bitmapIdx == 2){
+    private void toggleDrawable(){
+        if (drawableIdx == 2){
             alive = false;
             return;
         }
-        bitmapIdx = (bitmapIdx == 1 ? 0 : 1);
+        drawableIdx = (drawableIdx == 1 ? 0 : 1);
     }
 
     public void explode(){
         if (!exploded) {
-            bitmapIdx = 2;
+            drawableIdx = 2;
             frameCtr = 0;
             exploded = true;
             dy = dy / 2;
             dx = 0;
-        }
-    }
-
-    public void rotate(int degrees) {
-        Matrix m = new Matrix();
-        m.postRotate(degrees);
-
-        for (int i = 0; i < bitmaps.length; i++) {
-            bitmaps[i] = Bitmap.createBitmap(bitmaps[i], 0, 0, width, height, m, true);
         }
     }
 

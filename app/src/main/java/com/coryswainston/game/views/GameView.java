@@ -291,7 +291,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         for (Iterator<Comet> it = comets.iterator(); it.hasNext();){
             Comet comet = it.next();
-            if ((comet.getY() >= yFloor - comet.getHeight()) && !comet.isExploded()){
+            if ((comet.getHitRect().top >= yFloor - comet.getHeight()) && !comet.isExploded()){
                 comet.explode();
             }
             comet.update();
@@ -314,7 +314,7 @@ public class GameView extends SurfaceView implements Runnable {
         float dy = speed * (float)(Math.sin((float)Math.PI / 180.0f * angle));
         newComet.setDy(dy);
         newComet.setDx(dx);
-        newComet.rotate(degrees / 3);
+        newComet.setRotation(degrees / 3);
         newComet.setY(-newComet.getHeight());
 
         return newComet;

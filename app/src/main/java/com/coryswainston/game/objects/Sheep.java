@@ -2,9 +2,8 @@ package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 
 import com.coryswainston.game.R;
 
@@ -17,21 +16,21 @@ public class Sheep extends Sprite implements Hittable {
     private int stepTimer;
     private boolean burnt;
     private boolean seated;
-    private Bitmap[][] bitmaps;
+    private Drawable[][] drawables;
 
     public Sheep(Context context){
         x = y = dy = dx = 0;
         Resources res = context.getResources();
-        bitmaps = new Bitmap[2][4];
-        bitmaps[0][0] = BitmapFactory.decodeResource(res, R.drawable.sheep1);
-        bitmaps[0][1] = BitmapFactory.decodeResource(res, R.drawable.sheep2);
-        bitmaps[0][2] = BitmapFactory.decodeResource(res, R.drawable.sheep3);
-        bitmaps[0][3] = BitmapFactory.decodeResource(res, R.drawable.sheep4);
-        bitmaps[1][0] = BitmapFactory.decodeResource(res, R.drawable.sheep_burnt1);
-        bitmaps[1][1] = BitmapFactory.decodeResource(res, R.drawable.sheep_burnt2);
-        bitmaps[1][2] = BitmapFactory.decodeResource(res, R.drawable.sheep_burnt3);
-        bitmaps[1][3] = BitmapFactory.decodeResource(res, R.drawable.sheep_burnt4);
-        bitmapIdx = 0;
+        drawables = new Drawable[2][4];
+        drawables[0][0] = res.getDrawable(R.drawable.sheep1);
+        drawables[0][1] = res.getDrawable(R.drawable.sheep2);
+        drawables[0][2] = res.getDrawable(R.drawable.sheep3);
+        drawables[0][3] = res.getDrawable(R.drawable.sheep4);
+        drawables[1][0] = res.getDrawable(R.drawable.sheep_burnt1);
+        drawables[1][1] = res.getDrawable(R.drawable.sheep_burnt2);
+        drawables[1][2] = res.getDrawable(R.drawable.sheep_burnt3);
+        drawables[1][3] = res.getDrawable(R.drawable.sheep_burnt4);
+        drawableIdx = 0;
         alive = true;
         burnt = false;
         seated = false;
@@ -39,19 +38,8 @@ public class Sheep extends Sprite implements Hittable {
     }
 
     @Override
-    public Bitmap getBitmap() {
-        return bitmaps[burnt ? 1 : 0][bitmapIdx];
-    }
-
-    @Override
-    public void setSize(int width, int height) {
-        for (int i = 0; i < bitmaps.length; i++) {
-            for (int j = 0; j < bitmaps[i].length; j++) {
-                bitmaps[i][j] = Bitmap.createScaledBitmap(bitmaps[i][j], width, height, false);
-            }
-        }
-        this.width = width;
-        this.height = height;
+    public Drawable getDrawable() {
+        return drawables[burnt ? 1 : 0][drawableIdx];
     }
 
     @Override
@@ -72,18 +60,18 @@ public class Sheep extends Sprite implements Hittable {
     }
 
     public void turnLeft() {
-        bitmapIdx = 2;
+        drawableIdx = 2;
     }
 
     public void turnRight(){
-        bitmapIdx = 0;
+        drawableIdx = 0;
     }
 
     private void step() {
-        if (bitmapIdx % 2 == 0) {
-            bitmapIdx++;
+        if (drawableIdx % 2 == 0) {
+            drawableIdx++;
         } else {
-            bitmapIdx--;
+            drawableIdx--;
         }
     }
 
