@@ -1,7 +1,6 @@
 package com.coryswainston.game.objects;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 /**

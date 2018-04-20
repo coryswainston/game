@@ -6,15 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.coryswainston.game.activities.MainActivity;
-import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sprite;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**

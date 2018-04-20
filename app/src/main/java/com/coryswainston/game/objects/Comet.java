@@ -2,10 +2,8 @@ package com.coryswainston.game.objects;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import com.coryswainston.game.R;
 
