@@ -66,14 +66,14 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        gameView.resume();
+        gameView.resumePaused();
         mediaPlayer.start();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mediaPlayer.release();
+        mediaPlayer.pause();
     }
 
     @Override

@@ -149,16 +149,25 @@ public class GameView extends SurfaceView implements Runnable {
      * The game loop
      */
     public void run(){
-        while (!gameWon && llama.isAlive()){
+        while (playing) {
             long startMillis = System.nanoTime() / 1000000;
-            if (playing) {
-                update();
-            }
+            update();
             draw();
 
             long frameTime = (System.nanoTime() / 1000000) - startMillis;
             controlFrameRate(frameTime);
         }
+
+        while (!surfaceHolder.getSurface().isValid()) {
+            Log.d("Run", "Surface not valid. Waiting 100ms...");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        draw();
     }
 
     /**
@@ -181,7 +190,7 @@ public class GameView extends SurfaceView implements Runnable {
             case MotionEvent.ACTION_UP: // when finger releases
                 if(!playing) {
                     if (llama.isAlive() && !gameWon) {
-                        playing = true;
+                        resume();
                         return super.onTouchEvent(e);
                     } else {
                         Log.d("GameView", "Bout to return with score " + points);
@@ -433,11 +442,18 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void pause() {
         playing = false;
-        try {
-            gameThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (gameThread != null) {
+            try {
+                gameThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public void resumePaused() {
+        gameThread = new Thread(this);
+        gameThread.start();
     }
 
     public void resume() {
