@@ -242,10 +242,11 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void updateHighScore() {
-        if (!playing && points > highScore){
+        if (points > highScore && !playing) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(HIGH_SCORE, points);
             editor.apply();
+
             newHigh = true;
         }
     }
@@ -404,7 +405,7 @@ public class GameView extends SurfaceView implements Runnable {
         hoorahManager.drawHoorahs(drawingHelper);
 
         int fontSize = bounds.y / 20;
-        drawingHelper.drawScoreAndLevel(points, level, fontSize, 40, 70);
+        drawingHelper.drawScoreAndLevel(points, highScore, level, fontSize, 40, 70);
 
         if (!playing){
             drawingHelper.throwShade();
