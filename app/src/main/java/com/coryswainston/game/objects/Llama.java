@@ -135,6 +135,10 @@ public class Llama extends Sprite implements Hittable {
         }
     }
 
+    public int getHeadX() {
+        return getX() + width * (facingRight() ? 3 : 1) / 4;
+    }
+
     public boolean isDucking(){return ducking;}
 
     private void initializeDrawables() {

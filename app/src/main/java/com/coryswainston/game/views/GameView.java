@@ -21,6 +21,7 @@ import com.coryswainston.game.objects.Comet;
 import com.coryswainston.game.objects.Hoorah;
 import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sheep;
+import com.coryswainston.game.objects.Spitball;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,6 +54,7 @@ public class GameView extends SurfaceView implements Runnable {
     private SharedPreferences sharedPreferences;
 
     private Llama llama;
+    private List<Spitball> spitballs = new ArrayList<>();
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
     private final List<Cloud> clouds = new ArrayList<>(3);
@@ -182,10 +184,13 @@ public class GameView extends SurfaceView implements Runnable {
 
         switch (e.getActionMasked()){
             case MotionEvent.ACTION_DOWN: // when finger hits the screen
-                if (gestureHelper.isFirstTouch()) {
-                    gestureHelper.down(e);
-                    return true;
-                }
+                gestureHelper.down(e);
+                return true;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                gestureHelper.down(e);
+                return true;
+            case MotionEvent.ACTION_POINTER_UP:
+                gestureHelper.up(e);
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
                 if(!playing) {
@@ -203,7 +208,14 @@ public class GameView extends SurfaceView implements Runnable {
 
                 gestureHelper.up(e);
 
-                if (gestureHelper.noSwipe()) {
+                if (gestureHelper.isDoubleTouch()) {
+                    Spitball s = new Spitball(context, bounds.x / 100);
+                    s.setX(llama.getHeadX());
+                    s.setY(llama.getY());
+                    s.setDy(-bounds.y / 30);
+                    s.setDx(llama.getDx());
+                    spitballs.add(s);
+                } else if (gestureHelper.noSwipe()) {
                     if (e.getX() > bounds.x - 90 && e.getY() < 90) {
                         playing = false;
                     }
@@ -233,6 +245,7 @@ public class GameView extends SurfaceView implements Runnable {
             gameWon = true;
         }
         llama.update();
+        updateSpitballs();
         updateComets();
         detectCollisions();
         updateClouds();
@@ -248,6 +261,20 @@ public class GameView extends SurfaceView implements Runnable {
             editor.apply();
 
             newHigh = true;
+        }
+    }
+
+    private void updateSpitballs() {
+        for (Iterator<Spitball> it = spitballs.iterator(); it.hasNext();) {
+            Spitball s = it.next();
+
+            s.update();
+            if (s.getY() < 0) {
+                s.kill();
+            }
+            if (!s.isAlive()) {
+                it.remove();
+            }
         }
     }
 
@@ -352,6 +379,12 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 }
             }
+            for (Spitball spitball : spitballs) {
+                if (spitball.getHitRect().intersect(comet.getHitRect())) {
+                    comet.explode();
+                    spitball.kill();
+                }
+            }
         }
         for(Iterator<Sheep> it = sheeps.iterator(); it.hasNext();) {
             Sheep sheep = it.next();
@@ -400,7 +433,7 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
         drawingHelper.draw(llama.getSheepPile());
         drawingHelper.draw(llama);
-        drawingHelper.draw(sheeps, comets);
+        drawingHelper.draw(spitballs, sheeps, comets);
 
         hoorahManager.drawHoorahs(drawingHelper);
 

@@ -207,7 +207,8 @@ public class DrawingHelper {
         paint.setTextAlign(CENTER_ALIGN);
         paint.setStyle(Paint.Style.FILL);
         paint.setTypeface(JUA);
-        canvas.drawText(text, x, y, paint);    }
+        canvas.drawText(text, x, y, paint);
+    }
 
     /**
      * Draws text in a regular typeface. (Left aligned)

@@ -9,9 +9,11 @@ import android.view.MotionEvent;
 
 public class GestureHelper {
 
-    private TouchPoint initialTouch = null;
+    private Touch initialTouch = null;
     private float xDiff;
     private float yDiff;
+    private int numFingers;
+    private boolean gestureCompleted = false;
     private final int SWIPE_THRESHOLD = 200;
 
     public boolean isSwipeDown(MotionEvent e) {
@@ -42,33 +44,64 @@ public class GestureHelper {
         return initialTouch == null;
     }
 
+    public boolean isDoubleTouch() {
+        return numFingers > 1;
+    }
+
     public void up(MotionEvent e) {
-        xDiff = e.getX() - initialTouch.getX();
-        yDiff = e.getY() - initialTouch.getY();
-        initialTouch = null;
+        Log.d("GESTURE", "up called");
+        numFingers = initialTouch.getNumFingers();
+        if (e.getActionMasked() == MotionEvent.ACTION_UP) {
+            Log.d("GESTURE", "action up");
+            if (numFingers < 1) {
+                xDiff = e.getX() - initialTouch.getX();
+                yDiff = e.getY() - initialTouch.getY();
+            }
+            gestureCompleted = true;
+            initialTouch = null;
+        } else if (e.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
+            Log.d("GESTURE", "pointer up");
+            xDiff = e.getX() - initialTouch.getX();
+            yDiff = e.getY() - initialTouch.getY();
+        } else {
+            throw new IllegalStateException("Must call up() on ACTION_UP or ACTION_POINTER_UP");
+        }
     }
 
     public void down(MotionEvent e) {
-        initialTouch = new TouchPoint(e.getX(), e.getY());
+        Log.d("GESTURE", "down called");
+        initialTouch = new Touch(e.getX(), e.getY(), e.getPointerCount());
+        if (e.getPointerCount() > 1) {
+            Log.d("gesture", "Touch is more than one");
+        }
+        gestureCompleted = false;
     }
 
-    private class TouchPoint {
+    private class Touch {
 
-        TouchPoint() {
+        Touch() {
             this(0, 0);
         }
 
-        TouchPoint(float x, float y) {
-            setX(x);
-            setY(y);
+        Touch(float x, float y) {
+            this(x, y, 1);
+        }
+
+        Touch(float x, float y, int numFingers) {
+            this.x = x;
+            this.y = y;
+            this.numFingers = numFingers;
         }
 
         private float x;
         private float y;
+        private int numFingers;
 
         float getX() {return x;}
         float getY() {return y;}
         void setX(float x) {this.x = x;}
         void setY(float y) {this.y = y;}
+        int getNumFingers() {return numFingers;}
+        void setNumFingers(int numFingers) {this.numFingers = numFingers;}
     }
 }
