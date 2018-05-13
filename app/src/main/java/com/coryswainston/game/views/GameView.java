@@ -189,6 +189,12 @@ public class GameView extends SurfaceView implements Runnable {
             case MotionEvent.ACTION_POINTER_DOWN:
                 gestureHelper.down(e);
                 return true;
+            case MotionEvent.ACTION_MOVE:
+                gestureHelper.up(e);
+                if (gestureHelper.isDoubleSwipe()) {
+                    Log.d("gesture", "Here will be targeting. x=" + gestureHelper.getXSwipeRatio() + ", y=" + gestureHelper.getYSwipeRatio());
+                }
+                return true;
             case MotionEvent.ACTION_POINTER_UP:
                 gestureHelper.up(e);
                 return true;
@@ -208,12 +214,13 @@ public class GameView extends SurfaceView implements Runnable {
 
                 gestureHelper.up(e);
 
-                if (gestureHelper.isDoubleTouch()) {
+                if (gestureHelper.isDoubleSwipe()) {
                     Spitball s = new Spitball(context, bounds.x / 100);
                     s.setX(llama.getHeadX());
                     s.setY(llama.getY());
-                    s.setDy(-bounds.y / 30);
-                    s.setDx(llama.getDx());
+                    float velocity = -bounds.y / 20;
+                    s.setDy(gestureHelper.getYSwipeRatio() * velocity);
+                    s.setDx(gestureHelper.getXSwipeRatio() * velocity + llama.getDx());
                     spitballs.add(s);
                 } else if (gestureHelper.noSwipe()) {
                     if (e.getX() > bounds.x - 90 && e.getY() < 90) {
@@ -463,7 +470,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void controlFrameRate(long frameTime){
         long leftoverMillis = TARGET_MILLIS - frameTime;
-        Log.d("GAME VIEW", "Leftover Millis: " + leftoverMillis);
+//        Log.d("GAME VIEW", "Leftover Millis: " + leftoverMillis);
         if (leftoverMillis < 5){
             leftoverMillis = 5;
         }

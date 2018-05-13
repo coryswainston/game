@@ -13,7 +13,6 @@ public class GestureHelper {
     private float xDiff;
     private float yDiff;
     private int numFingers;
-    private boolean gestureCompleted = false;
     private final int SWIPE_THRESHOLD = 200;
 
     public boolean isSwipeDown(MotionEvent e) {
@@ -48,60 +47,64 @@ public class GestureHelper {
         return numFingers > 1;
     }
 
+    public boolean isDoubleSwipe() {
+        return isDoubleTouch() && !noSwipe();
+    }
+
+    public float getYSwipeRatio() {
+        if (noSwipe()) {
+            return 0;
+        }
+        float sum = Math.abs(xDiff) + Math.abs(yDiff);
+        return yDiff / sum;
+    }
+
+    public float getXSwipeRatio() {
+        if (noSwipe()) {
+            return 0;
+        }
+        float sum = Math.abs(xDiff) + Math.abs(yDiff);
+        return xDiff / sum;
+    }
+
     public void up(MotionEvent e) {
-        Log.d("GESTURE", "up called");
-        numFingers = initialTouch.getNumFingers();
-        if (e.getActionMasked() == MotionEvent.ACTION_UP) {
-            Log.d("GESTURE", "action up");
-            if (numFingers < 1) {
-                xDiff = e.getX() - initialTouch.getX();
-                yDiff = e.getY() - initialTouch.getY();
-            }
-            gestureCompleted = true;
-            initialTouch = null;
-        } else if (e.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
-            Log.d("GESTURE", "pointer up");
-            xDiff = e.getX() - initialTouch.getX();
-            yDiff = e.getY() - initialTouch.getY();
+        if (e.getPointerId(0) == initialTouch.id) {
+            Log.d("GESTURE", "up called");
+            numFingers = initialTouch.numFingers;
+            xDiff = e.getX() - initialTouch.x;
+            yDiff = e.getY() - initialTouch.y;
         } else {
-            throw new IllegalStateException("Must call up() on ACTION_UP or ACTION_POINTER_UP");
+            Log.d("GESTURE", "pointer up");
+        }
+        if (e.getActionMasked() == MotionEvent.ACTION_UP) {
+            initialTouch = null;
         }
     }
 
     public void down(MotionEvent e) {
         Log.d("GESTURE", "down called");
-        initialTouch = new Touch(e.getX(), e.getY(), e.getPointerCount());
+        if (initialTouch == null) {
+            initialTouch = new Touch(e.getX(), e.getY(), e.getPointerCount(), e.getPointerId(0));
+        } else {
+            initialTouch.numFingers = e.getPointerCount();
+        }
         if (e.getPointerCount() > 1) {
             Log.d("gesture", "Touch is more than one");
         }
-        gestureCompleted = false;
     }
 
     private class Touch {
 
-        Touch() {
-            this(0, 0);
-        }
-
-        Touch(float x, float y) {
-            this(x, y, 1);
-        }
-
-        Touch(float x, float y, int numFingers) {
+        Touch(float x, float y, int numFingers, int id) {
             this.x = x;
             this.y = y;
             this.numFingers = numFingers;
+            this.id = id;
         }
 
-        private float x;
-        private float y;
-        private int numFingers;
-
-        float getX() {return x;}
-        float getY() {return y;}
-        void setX(float x) {this.x = x;}
-        void setY(float y) {this.y = y;}
-        int getNumFingers() {return numFingers;}
-        void setNumFingers(int numFingers) {this.numFingers = numFingers;}
+        float x;
+        float y;
+        int numFingers;
+        int id;
     }
 }
