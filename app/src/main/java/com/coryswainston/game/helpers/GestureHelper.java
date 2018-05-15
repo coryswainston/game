@@ -13,7 +13,7 @@ public class GestureHelper {
     private float xDiff;
     private float yDiff;
     private int numFingers;
-    private final int SWIPE_THRESHOLD = 200;
+    private final int SWIPE_THRESHOLD = 100;
 
     public boolean isSwipeDown(MotionEvent e) {
         return yDiff - SWIPE_THRESHOLD > 0;

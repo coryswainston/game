@@ -44,10 +44,10 @@ public class MenuView extends SurfaceView implements Runnable{
         flashSwitch = false;
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.menu_background);
-        background = Bitmap.createScaledBitmap(background, bounds.x, bounds.y, false);
+        background = Bitmap.createScaledBitmap(background, bounds.y * 4 / 3, bounds.y, false);
 
-        llama = new Llama(context, bounds.y / 5);
-        llama.setY(bounds.y * 11 / 16 - llama.getHeight());
+        llama = new Llama(context, bounds.x / 6);
+        llama.setY(bounds.y * 3 /4);
         llama.setFloor(llama.getY());
         llama.setX(bounds.x * 3 / 4);
         llama.setDx(10);
@@ -61,12 +61,12 @@ public class MenuView extends SurfaceView implements Runnable{
             drawingHelper.fillBackground(DrawingHelper.WHITE);
             drawingHelper.drawWatermark(background);
 
-            drawingHelper.drawRegularText("Llama", bounds.y / 4, bounds.y / 6,
-                                        bounds.y * 3 / 8, DrawingHelper.BLUE);
-            drawingHelper.drawRegularText("Lland", bounds.y / 4, bounds.y / 6,
-                                        bounds.y * 11 / 16, DrawingHelper.BLUE);
-            drawingHelper.drawRegularText("Tap to play", bounds.y / 12, bounds.y / 6,
-                                        bounds.y * 7/ 8, Color.argb(flashAlpha, 0, 100, 0));
+            drawingHelper.drawCenterText("Llama", bounds.x / 4, bounds.x / 2,
+                                        bounds.y / 3, DrawingHelper.BLUE);
+            drawingHelper.drawCenterText("Lland", bounds.x / 4, bounds.x / 2,
+                                        bounds.y / 2, DrawingHelper.BLUE);
+            drawingHelper.drawCenterText("Tap to play", bounds.x / 12, bounds.x / 2,
+                                        bounds.y * 3 / 5, Color.argb(flashAlpha, 0, 100, 0));
 
             int width = llama.getWidth() / 12;
             int shadowLeft = llama.getX() + width * (llama.facingRight() ? 1 : 2);

@@ -240,7 +240,7 @@ public class DrawingHelper {
      * Casts a white shadow over the scene.
      */
     public void throwShade() {
-        canvas.drawColor(Color.argb(150, 255, 255, 255));
+        canvas.drawColor(Color.argb(170, 255, 255, 255));
     }
 
     /**

@@ -35,11 +35,11 @@ public class HoorahManager {
     private int getIntFromFontSize(FontSize fontSize) {
         switch (fontSize) {
             case LARGE:
-                return bounds.y / 4;
+                return bounds.x / 4;
             case MEDIUM:
-                return bounds.y / 8;
+                return bounds.x / 8;
             case SMALL: default:
-                return bounds.y / 16;
+                return bounds.x / 16;
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.SoundPool;
@@ -113,7 +114,7 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void createLlama() {
-        int width = bounds.y / 5;
+        int width = bounds.x / 6;
         llama = new Llama(context, width);
         llama.setX(bounds.x / 2);
         llama.setY(yFloor - llama.getHeight());
@@ -123,7 +124,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void setUpBoundaries() {
         bounds = new Point();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(bounds);
-        yFloor = bounds.y - bounds.y / 7;
+        yFloor = bounds.y - bounds.y / 5;
         surfaceHolder.setFixedSize(bounds.x, bounds.y);
         hoorahManager = new HoorahManager(bounds);
     }
@@ -131,7 +132,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void setUpClouds() {
         for(int i = 0; i < 3; i++){
             Cloud cloud = new Cloud(context);
-            cloud.setSize(bounds.y / 4, bounds.y / 6);
+            cloud.setSize(bounds.x / 6, bounds.x / 8);
             cloud.setDx((float)(.5 - 0.1 * i));
             clouds.add(i, cloud);
         }
@@ -236,10 +237,10 @@ public class GameView extends SurfaceView implements Runnable {
                 gestureHelper.up(e);
 
                 if (gestureHelper.isDoubleSwipe()) {
-                    Spitball s = new Spitball(context, bounds.x / 100);
+                    Spitball s = new Spitball(context, bounds.x / 80);
                     s.setX(llama.getHeadX());
                     s.setY(llama.getMouthY());
-                    float velocity = -bounds.y / 20;
+                    float velocity = -bounds.x / 20;
                     s.setDy(gestureHelper.getYSwipeRatio() * velocity);
                     s.setDx(gestureHelper.getXSwipeRatio() * velocity);
                     spitballs.add(s);
@@ -329,7 +330,7 @@ public class GameView extends SurfaceView implements Runnable {
             framesSinceLastSheep++;
         }
         if (newSheep != null) {
-            newSheep.setSize(bounds.y / 6, bounds.y / 9);
+            newSheep.setSize(bounds.x / 7, bounds.x / 10);
             newSheep.setX(random.nextInt(2) == 1 ? bounds.x : -newSheep.getWidth());
             newSheep.setY(yFloor - newSheep.getHeight());
             newSheep.setDx(newSheep.getX() > 0 ? -5 : 5);
@@ -368,11 +369,11 @@ public class GameView extends SurfaceView implements Runnable {
     private Comet getNewComet() {
         Random random = new Random();
         Comet newComet = new Comet(getContext(), random.nextInt(bounds.x));
-        int height = (int) (bounds.y / 5.5);
+        int height = (int) (bounds.x / 6.5);
         int width = (int) (height * 0.6);
         newComet.setSize(width, height);
-        int speed = bounds.y / 75;
-        int degrees = random.nextInt(30) - 15;
+        int speed = bounds.x / 75;
+        int degrees = random.nextInt(20) - 10;
         int angle = 90 - degrees;
         float dx = speed * -(float)(Math.cos((float)Math.PI / 180.0f * angle));
         float dy = speed * (float)(Math.sin((float)Math.PI / 180.0f * angle));
@@ -458,6 +459,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         drawingHelper.draw(clouds);
         drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
+        // pause button
         drawingHelper.drawRectangle(bounds.x - 70, 20, bounds.x - 55, 70, DrawingHelper.BLACK);
         drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
         drawingHelper.draw(llama.getSheepPile());
@@ -469,25 +471,26 @@ public class GameView extends SurfaceView implements Runnable {
 
         hoorahManager.drawHoorahs(drawingHelper);
 
-        int fontSize = bounds.y / 20;
+        int fontSize = bounds.x / 20;
         drawingHelper.drawScoreAndLevel(points, highScore, level, fontSize, 40, 70);
 
         if (!playing){
             drawingHelper.throwShade();
             int xTextPosition = bounds.x / 2;
-            int yTextPosition = bounds.y / 3;
-            fontSize = bounds.y / 4;
+            int yTextPosition = (int) (bounds.y / 2.5);
+            fontSize = bounds.x / 6;
             String messageText = "GAME OVER";
             if (llama.isAlive()) {
                 messageText = gameWon ? "YOU WIN!" : "PAUSED";
             }
+//            drawingHelper.drawRectangle(0, bounds.y / 4, bounds.x, bounds.y * 5 / 8, Color.argb(255, 220, 220, 220));
             drawingHelper.drawCenterText(messageText, fontSize, xTextPosition, yTextPosition,
                     DrawingHelper.BLUE);
             drawingHelper.drawCenterText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
-                    newHigh ? fontSize / 2 : fontSize, xTextPosition, yTextPosition + fontSize + 50,
+                    newHigh ? fontSize / 2 : fontSize, xTextPosition, yTextPosition + fontSize,
                     DrawingHelper.DARK_GREEN);
-            drawingHelper.drawCenterText("Tap to continue", bounds.y / 12, xTextPosition,
-                    bounds.y * 3/4, DrawingHelper.DARK_RED);
+            drawingHelper.drawCenterText("Tap to continue", bounds.x / 15, xTextPosition,
+                    yTextPosition + fontSize * 3 / 2, DrawingHelper.DARK_RED);
         }
 
         drawingHelper.finish();
