@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -56,7 +57,6 @@ public class DrawingHelper {
         AssetManager assets = context.getAssets();
         VALERA = Typeface.createFromAsset(assets, "VarelaRound-Regular.ttf");
         JUA = Typeface.createFromAsset(assets, "Jua-Regular.ttf");
-        paint.setTypeface(JUA);
         this.surfaceHolder = surfaceHolder;
         if (readyToDraw()) {
             canvas = surfaceHolder.lockCanvas();
@@ -171,6 +171,14 @@ public class DrawingHelper {
         r.right = right;
         r.bottom = bottom;
         canvas.drawOval(r, paint);
+    }
+
+    public void drawDashedLine(Rect coords, int color, float width) {
+        paint.setColor(color);
+        paint.setPathEffect(new DashPathEffect(new float[] {width * 2, width * 4}, 0));
+        paint.setStrokeWidth(width);
+        canvas.drawLine(coords.left, coords.bottom, coords.right, coords.top, paint);
+        paint.reset();
     }
 
     /**

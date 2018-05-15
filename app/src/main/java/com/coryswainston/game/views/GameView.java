@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,6 +55,7 @@ public class GameView extends SurfaceView implements Runnable {
     private SharedPreferences sharedPreferences;
 
     private Llama llama;
+    private Rect aimer;
     private List<Spitball> spitballs = new ArrayList<>();
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
@@ -182,6 +184,8 @@ public class GameView extends SurfaceView implements Runnable {
     @SuppressWarnings("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent e){
 
+        aimer = null;
+
         switch (e.getActionMasked()){
             case MotionEvent.ACTION_DOWN: // when finger hits the screen
                 gestureHelper.down(e);
@@ -192,7 +196,24 @@ public class GameView extends SurfaceView implements Runnable {
             case MotionEvent.ACTION_MOVE:
                 gestureHelper.up(e);
                 if (gestureHelper.isDoubleSwipe()) {
-                    Log.d("gesture", "Here will be targeting. x=" + gestureHelper.getXSwipeRatio() + ", y=" + gestureHelper.getYSwipeRatio());
+                    float xRatio = gestureHelper.getXSwipeRatio();
+                    float yRatio = gestureHelper.getYSwipeRatio();
+
+                    Log.d("gesture", "Here will be targeting. x=" + xRatio + ", y=" + yRatio);
+
+                    int llamaX = llama.getHeadX();
+                    int llamaY = llama.getMouthY();
+
+                    int xDist = (xRatio > 0 ? 0 : bounds.x) - llamaX;
+                    int yDist = (yRatio > 0 ? 0 : bounds.y) - llamaY;
+                    if (Math.abs(xRatio) > Math.abs(yRatio)) {
+                        yDist = (int)(xDist * (yRatio / xRatio));
+                    } else {
+                        xDist = (int)(yDist * (xRatio / yRatio));
+                    }
+
+
+                    aimer = new Rect(llamaX, llamaY + yDist, llamaX + xDist, llamaY);
                 }
                 return true;
             case MotionEvent.ACTION_POINTER_UP:
@@ -217,10 +238,10 @@ public class GameView extends SurfaceView implements Runnable {
                 if (gestureHelper.isDoubleSwipe()) {
                     Spitball s = new Spitball(context, bounds.x / 100);
                     s.setX(llama.getHeadX());
-                    s.setY(llama.getY());
+                    s.setY(llama.getMouthY());
                     float velocity = -bounds.y / 20;
                     s.setDy(gestureHelper.getYSwipeRatio() * velocity);
-                    s.setDx(gestureHelper.getXSwipeRatio() * velocity + llama.getDx());
+                    s.setDx(gestureHelper.getXSwipeRatio() * velocity);
                     spitballs.add(s);
                 } else if (gestureHelper.noSwipe()) {
                     if (e.getX() > bounds.x - 90 && e.getY() < 90) {
@@ -251,13 +272,13 @@ public class GameView extends SurfaceView implements Runnable {
             playing = false;
             gameWon = true;
         }
-        llama.update();
         updateSpitballs();
         updateComets();
         detectCollisions();
         updateClouds();
         updateSheep();
         checkBounds();
+        llama.update();
         updateHighScore();
     }
 
@@ -416,7 +437,8 @@ public class GameView extends SurfaceView implements Runnable {
                 sheep.setDx(-sheep.getDx());
             }
         }
-        if (llama.getX() > bounds.x - llama.getWidth() || llama.getX() < 0){
+        if (llama.getX() > bounds.x - llama.getWidth() && llama.facingRight() ||
+                llama.getX() < 0 && !llama.facingRight()){
             llama.setDx(0);
         }
     }
@@ -441,6 +463,9 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.draw(llama.getSheepPile());
         drawingHelper.draw(llama);
         drawingHelper.draw(spitballs, sheeps, comets);
+        if (aimer != null) {
+            drawingHelper.drawDashedLine(aimer, DrawingHelper.WHITE, bounds.x / 200);
+        }
 
         hoorahManager.drawHoorahs(drawingHelper);
 
