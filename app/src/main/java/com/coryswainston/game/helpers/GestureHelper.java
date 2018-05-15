@@ -14,8 +14,9 @@ public class GestureHelper {
     private float yDiff;
     private int numFingers;
     private final int SWIPE_THRESHOLD = 100;
+    private final int TIME_THRESHOLD = 200;
 
-    public boolean isSwipeDown(MotionEvent e) {
+    public boolean isSwipeDown() {
         return yDiff - SWIPE_THRESHOLD > 0;
     }
 
@@ -45,6 +46,14 @@ public class GestureHelper {
 
     public boolean isDoubleTouch() {
         return numFingers > 1;
+    }
+
+    public boolean isLongSwipe(MotionEvent e) {
+        return e.getEventTime() - e.getDownTime() > TIME_THRESHOLD && !noSwipe();
+    }
+
+    public boolean isLongTouch(MotionEvent e) {
+        return e.getEventTime() - e.getDownTime() > TIME_THRESHOLD && noSwipe();
     }
 
     public boolean isDoubleSwipe() {

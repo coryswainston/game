@@ -196,7 +196,7 @@ public class GameView extends SurfaceView implements Runnable {
                 return true;
             case MotionEvent.ACTION_MOVE:
                 gestureHelper.up(e);
-                if (gestureHelper.isDoubleSwipe()) {
+                if (gestureHelper.isLongSwipe(e)) {
                     float xRatio = gestureHelper.getXSwipeRatio();
                     float yRatio = gestureHelper.getYSwipeRatio();
 
@@ -236,7 +236,7 @@ public class GameView extends SurfaceView implements Runnable {
 
                 gestureHelper.up(e);
 
-                if (gestureHelper.isDoubleSwipe()) {
+                if (gestureHelper.isLongSwipe(e)) {
                     Spitball s = new Spitball(context, bounds.x / 80);
                     s.setX(llama.getHeadX());
                     s.setY(llama.getMouthY());
@@ -257,7 +257,7 @@ public class GameView extends SurfaceView implements Runnable {
                     llama.setDx(-30);
                 } else if (gestureHelper.isSwipeUp()){
                     llama.jump();
-                } else {
+                } else if (gestureHelper.isSwipeDown()) {
                     llama.duck();
                 }
                 return true;
@@ -483,7 +483,6 @@ public class GameView extends SurfaceView implements Runnable {
             if (llama.isAlive()) {
                 messageText = gameWon ? "YOU WIN!" : "PAUSED";
             }
-//            drawingHelper.drawRectangle(0, bounds.y / 4, bounds.x, bounds.y * 5 / 8, Color.argb(255, 220, 220, 220));
             drawingHelper.drawCenterText(messageText, fontSize, xTextPosition, yTextPosition,
                     DrawingHelper.BLUE);
             drawingHelper.drawCenterText((newHigh ? "NEW HIGH SCORE: " : "SCORE: ") + points,
