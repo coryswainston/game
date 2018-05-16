@@ -195,7 +195,7 @@ public class DrawingHelper {
         paint.setTextSize(fontSize);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(VALERA);
-        canvas.drawText("SCORE: " + points + "  LEVEL: " + level, x, y, paint);
+        canvas.drawText("SCORE: " + points + "  SHEEP: " + level, x, y, paint);
         paint.setColor(DARK_GREEN);
         canvas.drawText("HIGH: " + high, x, y + fontSize * 1.2f, paint);
     }

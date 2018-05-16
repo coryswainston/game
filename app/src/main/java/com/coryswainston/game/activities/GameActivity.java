@@ -29,13 +29,13 @@ public class GameActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             score = savedInstanceState.getInt(SCORE, getIntent().getIntExtra(SCORE, 0));
-            level = savedInstanceState.getInt(LEVEL, getIntent().getIntExtra(LEVEL, 1));
+//            level = savedInstanceState.getInt(LEVEL, getIntent().getIntExtra(LEVEL, 1));
         } else {
             score = getIntent().getIntExtra(SCORE, 0);
-            level = getIntent().getIntExtra(LEVEL, 1);
+//            level = getIntent().getIntExtra(LEVEL, 1);
         }
 
-        gameView = new GameView(this, score, level);
+        gameView = new GameView(this, score);
         gameView.setFinishListener(new ViewListener() {
             @Override
             public void onAction(Intent data) {
@@ -47,7 +47,7 @@ public class GameActivity extends AppCompatActivity {
         setContentView(gameView);
         mediaPlayer = MediaPlayer.create(this, R.raw.pixelland);
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setVolume(0.6f, 0.6f);
+        mediaPlayer.setVolume(0.4f, 0.4f);
         mediaPlayer.start();
     }
 

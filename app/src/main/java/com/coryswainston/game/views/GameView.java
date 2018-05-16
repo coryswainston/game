@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import static com.coryswainston.game.objects.Hoorah.TIME_MED;
+
 /**
  * View that handles the game
  *
@@ -64,11 +66,13 @@ public class GameView extends SurfaceView implements Runnable {
     private int cometsPerMinute;
     private int framesSinceLastComet;
     private int sheepPerMinute;
-    private int numberOfSheep;
     private int framesSinceLastSheep;
 
+    private List<String> instructions;
+    private Iterator<String> instructionIt;
+    private String instruction;
+
     int points;
-    int level;
     int highScore;
     boolean newHigh;
     boolean gameWon;
@@ -79,7 +83,7 @@ public class GameView extends SurfaceView implements Runnable {
      * @param context of the activity.
      */
     public GameView(Context context) {
-        this(context, 0, 1);
+        this(context, 0);
     }
 
     /**
@@ -87,13 +91,11 @@ public class GameView extends SurfaceView implements Runnable {
      *
      * @param context the activity we're in.
      * @param points carried over from previous level.
-     * @param level the user is currently in.
      */
-    public GameView(Context context, int points, int level) {
+    public GameView(Context context, int points) {
         super(context);
         this.context = context;
         this.points = points;
-        this.level = level;
 
         setUpBoundaries();
         createLlama();
@@ -101,15 +103,19 @@ public class GameView extends SurfaceView implements Runnable {
         loadHighScore();
         initializeGameConditions();
 
-        hoorahManager.makeHoorah(hoorahManager.getCenter(), HoorahManager.FontSize.MEDIUM,
-                Hoorah.TIME_LONG, "LEVEL " + level);
+        instructions = new ArrayList<>();
+        instructions.add("Swipe left or right to \nskate across the screen.");
+        instructions.add("Swipe down to pick up \nsheep.");
+        instructions.add("Swipe up to jump.");
+        instructions.add("Swipe and hold in any \ndirection to spit.");
+        instructionIt = instructions.iterator();
+        instruction = instructionIt.next();
     }
 
     private void initializeGameConditions() {
-        cometsPerMinute = BASE_PER_MINUTE + level * 2;
+        cometsPerMinute = BASE_PER_MINUTE;
         framesSinceLastComet = 0;
         sheepPerMinute = BASE_PER_MINUTE * 2;
-        numberOfSheep = level;
         framesSinceLastSheep = 0;
     }
 
@@ -221,6 +227,12 @@ public class GameView extends SurfaceView implements Runnable {
                 gestureHelper.up(e);
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
+                if (instructionIt.hasNext()) {
+                    instruction = instructionIt.next();
+                } else {
+                    instruction = null;
+                }
+
                 if(!playing) {
                     if (llama.isAlive() && !gameWon) {
                         resume();
@@ -249,16 +261,16 @@ public class GameView extends SurfaceView implements Runnable {
                         playing = false;
                     }
                     llama.setDx(0);
+                } else if (gestureHelper.isSwipeUp()) {    // Order is important here because
+                    llama.jump();                          // diagonal swipes are more likely to
+                } else if (gestureHelper.isSwipeDown()) {  // be jumps or ducks. Vertical distance
+                    llama.duck();                          // should be checked for first.
                 } else if (gestureHelper.isRightSwipe()){
                     llama.turnRight();
                     llama.setDx(30);
                 } else if (gestureHelper.isLeftSwipe()) {
                     llama.turnLeft();
                     llama.setDx(-30);
-                } else if (gestureHelper.isSwipeUp()){
-                    llama.jump();
-                } else if (gestureHelper.isSwipeDown()) {
-                    llama.duck();
                 }
                 return true;
         }
@@ -269,10 +281,11 @@ public class GameView extends SurfaceView implements Runnable {
      * Move everything along
      */
     private void update(){
-        if (llama.getPileSize() == numberOfSheep) {
-            playing = false;
-            gameWon = true;
-        }
+//        if (llama.getPileSize() == numberOfSheep) {
+//            playing = false;
+//            gameWon = true;
+//        }
+//        TODO Add a new way to win the game
         updateSpitballs();
         updateComets();
         detectCollisions();
@@ -322,8 +335,7 @@ public class GameView extends SurfaceView implements Runnable {
         int odds = (int) (1 / sheepPerFrame);
         Sheep newSheep = null;
         Random random = new Random();
-        if (random.nextInt(odds) == 1 && sheeps.size() + llama.getSheepPile().size() < numberOfSheep
-                && framesSinceLastSheep > 30) {
+        if (random.nextInt(odds) == 1 && framesSinceLastSheep > 30) {
             newSheep = new Sheep(getContext());
             framesSinceLastSheep = 0;
         } else {
@@ -348,7 +360,7 @@ public class GameView extends SurfaceView implements Runnable {
         float cometsPerFrame = cometsPerMinute / 60.0f / 30.0f;
         int odds = (int) (1 / cometsPerFrame);
         Random random = new Random();
-        if ((random.nextInt(odds) == 1 || framesSinceLastComet == odds * 2) && comets.size() < Math.max(level, 2)) {
+        if ((random.nextInt(odds) == 1 || framesSinceLastComet == odds * 2) && comets.size() < Math.max(llama.getPileSize(), 2)) {
             framesSinceLastComet = 0;
             comets.add(getNewComet());
         } else {
@@ -402,7 +414,7 @@ public class GameView extends SurfaceView implements Runnable {
                         points -= 50;
                         hoorahManager.makeHoorah(new Point(comet.getX(), comet.getY()),
                                 HoorahManager.FontSize.SMALL,
-                                Hoorah.TIME_MED,
+                                TIME_MED,
                                 "-50");
                         sheep.burn();
                     }
@@ -412,6 +424,11 @@ public class GameView extends SurfaceView implements Runnable {
                 if (spitball.getHitRect().intersect(comet.getHitRect())) {
                     comet.explode();
                     spitball.kill();
+                    hoorahManager.makeHoorah(new Point(comet.getX(), comet.getY()),
+                            HoorahManager.FontSize.SMALL,
+                            TIME_MED,
+                            "+25");
+                    points += 25;
                 }
             }
         }
@@ -422,7 +439,7 @@ public class GameView extends SurfaceView implements Runnable {
                 it.remove();
                 llama.addToPile(sheep);
                 points += 100;
-                hoorahManager.makeHoorah(sheepCenter, HoorahManager.FontSize.SMALL, Hoorah.TIME_MED,
+                hoorahManager.makeHoorah(sheepCenter, HoorahManager.FontSize.SMALL, TIME_MED,
                         "+100");
             }
         }
@@ -472,7 +489,15 @@ public class GameView extends SurfaceView implements Runnable {
         hoorahManager.drawHoorahs(drawingHelper);
 
         int fontSize = bounds.x / 20;
-        drawingHelper.drawScoreAndLevel(points, highScore, level, fontSize, 40, 70);
+        drawingHelper.drawScoreAndLevel(points, highScore, llama.getPileSize(), fontSize, 40, 70);
+
+        if (instruction != null) {
+            String[] lines = instruction.split("\n");
+            for (int i = 0; i < lines.length; i++) {
+                drawingHelper.drawCenterText(lines[i], fontSize, bounds.x / 2,
+                        yFloor + fontSize * 2 + fontSize * i, DrawingHelper.WHITE);
+            }
+        }
 
         if (!playing){
             drawingHelper.throwShade();
@@ -545,7 +570,7 @@ public class GameView extends SurfaceView implements Runnable {
     public Bundle getStateVars() {
         Bundle data = new Bundle();
         data.putInt("score", points);
-        data.putInt("level", level);
+        data.putInt("level", llama.getPileSize());
 
         return data;
     }
