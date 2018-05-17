@@ -58,22 +58,25 @@ public class MenuView extends SurfaceView implements Runnable{
         DrawingHelper drawingHelper = new DrawingHelper(context, getHolder());
         if (drawingHelper.readyToDraw()) {
 
-            drawingHelper.fillBackground(DrawingHelper.WHITE);
-            drawingHelper.drawWatermark(background);
+            drawingHelper.fillBackground(DrawingHelper.SKY_BLUE);
+//            drawingHelper.drawWatermark(background);
 
-            drawingHelper.drawCenterText("Llama", bounds.x / 4, bounds.x / 2,
-                                        bounds.y / 3, DrawingHelper.BLUE);
-            drawingHelper.drawCenterText("Lland", bounds.x / 4, bounds.x / 2,
-                                        bounds.y / 2, DrawingHelper.BLUE);
-            drawingHelper.drawCenterText("Tap to play", bounds.x / 12, bounds.x / 2,
+            drawingHelper.drawMenuText("Llama", bounds.x / 5, bounds.x / 2,
+                                        bounds.y / 3, DrawingHelper.WHITE);
+            drawingHelper.drawMenuText("Lland", bounds.x / 5, bounds.x / 2,
+                                        bounds.y / 2, DrawingHelper.WHITE);
+            drawingHelper.drawMenuText("Tap to play", bounds.x / 14, bounds.x / 2,
                                         bounds.y * 3 / 5, Color.argb(flashAlpha, 0, 100, 0));
+
+            drawingHelper.drawRectangle(0, bounds.y * 3 / 4 + llama.getHeight(), bounds.x, bounds.y, DrawingHelper.DARK_GREEN);
+
 
             int width = llama.getWidth() / 12;
             int shadowLeft = llama.getX() + width * (llama.facingRight() ? 1 : 2);
             int shadowRight = llama.getX() + llama.getWidth() - width * (llama.facingRight() ? 2 : 1);
             int shadowTop = llama.getFloor() + llama.getHeight() - width;
             int shadowBottom = llama.getFloor() + llama.getHeight() + width;
-            drawingHelper.drawOval(shadowLeft, shadowTop, shadowRight, shadowBottom, DrawingHelper.GREY);
+//            drawingHelper.drawOval(shadowLeft, shadowTop, shadowRight, shadowBottom, DrawingHelper.GREY);
 
             drawingHelper.draw(llama);
 

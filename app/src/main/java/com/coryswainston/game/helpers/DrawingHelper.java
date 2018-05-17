@@ -42,6 +42,7 @@ public class DrawingHelper {
 
     private final Typeface VALERA;
     private final Typeface JUA;
+    private final Typeface PRESS_START_2P;
 
     private Paint paint = new Paint();
     private Canvas canvas;
@@ -57,6 +58,7 @@ public class DrawingHelper {
         AssetManager assets = context.getAssets();
         VALERA = Typeface.createFromAsset(assets, "VarelaRound-Regular.ttf");
         JUA = Typeface.createFromAsset(assets, "Jua-Regular.ttf");
+        PRESS_START_2P = Typeface.createFromAsset(assets, "PressStart2P-Regular.ttf");
         this.surfaceHolder = surfaceHolder;
         if (readyToDraw()) {
             canvas = surfaceHolder.lockCanvas();
@@ -215,6 +217,24 @@ public class DrawingHelper {
         paint.setTextAlign(CENTER_ALIGN);
         paint.setStyle(Paint.Style.FILL);
         paint.setTypeface(JUA);
+        canvas.drawText(text, x, y, paint);
+    }
+
+    /**
+     * Draws centered text for the menu.
+     *
+     * @param text to draw.
+     * @param fontSize of the text.
+     * @param x coordinate.
+     * @param y coordinate.
+     * @param color of the text.
+     */
+    public void drawMenuText(String text, int fontSize, int x, int y, int color) {
+        paint.setColor(color);
+        paint.setTextSize(fontSize);
+        paint.setTextAlign(CENTER_ALIGN);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTypeface(PRESS_START_2P);
         canvas.drawText(text, x, y, paint);
     }
 
