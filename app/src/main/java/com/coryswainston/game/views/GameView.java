@@ -24,6 +24,8 @@ import com.coryswainston.game.objects.Hoorah;
 import com.coryswainston.game.objects.Llama;
 import com.coryswainston.game.objects.Sheep;
 import com.coryswainston.game.objects.Spitball;
+import com.coryswainston.game.objects.Sprite;
+import com.coryswainston.game.objects.Ufo;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,6 +61,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private Llama llama;
     private Rect aimer;
+    private Ufo ufo;
     private List<Spitball> spitballs = new ArrayList<>();
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
@@ -293,6 +296,7 @@ public class GameView extends SurfaceView implements Runnable {
         updateSheep();
         checkBounds();
         llama.update();
+        updateUfo();
         updateHighScore();
     }
 
@@ -303,6 +307,26 @@ public class GameView extends SurfaceView implements Runnable {
             editor.apply();
 
             newHigh = true;
+        }
+    }
+
+    private void updateUfo() {
+        if (llama.getPileSize() >= 10 && ufo == null) {
+            Log.d("GameView", "Creating UFO");
+            ufo = new Ufo(context);
+
+            ufo.setSize(bounds.x / 4, bounds.x / 8);
+            ufo.setX(new Random().nextInt(bounds.x - ufo.getWidth()));
+            ufo.setY(-ufo.getHeight());
+            ufo.setDy(20);
+            ufo.setDx(0);
+            ufo.setFloor(yFloor);
+        }
+        if (ufo != null && !ufo.isAlive()) {
+            ufo = null;
+        }
+        if (ufo != null) {
+            ufo.update();
         }
     }
 
@@ -443,6 +467,14 @@ public class GameView extends SurfaceView implements Runnable {
                         "+100");
             }
         }
+
+        if (ufo != null && llama.getPileSize() >= 10 && ufo.getHitRect().contains(llama.getHitRect())) {
+            ufo.getSheep().addAll(llama.getSheepPile());
+            llama.getSheepPile().removeAll(llama.getSheepPile());
+            for (Sheep sheep : ufo.getSheep()) {
+                sheep.setX(ufo.getHitRect().centerX() - sheep.getWidth() / 2);
+            }
+        }
     }
 
     private void checkBounds(){
@@ -476,17 +508,24 @@ public class GameView extends SurfaceView implements Runnable {
 
         drawingHelper.draw(clouds);
         drawingHelper.drawRectangle(0, yFloor, bounds.x, bounds.y, DrawingHelper.DARK_GREEN); // the ground
-        // pause button
-        drawingHelper.drawRectangle(bounds.x - 70, 20, bounds.x - 55, 70, DrawingHelper.BLACK);
-        drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
         drawingHelper.draw(llama.getSheepPile());
         drawingHelper.draw(llama);
         drawingHelper.draw(spitballs, sheeps, comets);
         if (aimer != null) {
             drawingHelper.drawDashedLine(aimer, DrawingHelper.WHITE, bounds.x / 200);
         }
+        if (ufo != null) {
+            drawingHelper.draw(ufo.getSheep());
+            Rect beamRect = ufo.getHitRect();
+            drawingHelper.drawRectangle(beamRect.left, beamRect.top, beamRect.right, beamRect.bottom, Color.argb(100, 255, 255, 0));
+            drawingHelper.draw(ufo);
+        }
 
         hoorahManager.drawHoorahs(drawingHelper);
+
+        // pause button
+        drawingHelper.drawRectangle(bounds.x - 70, 20, bounds.x - 55, 70, DrawingHelper.BLACK);
+        drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
 
         int fontSize = bounds.x / 20;
         drawingHelper.drawScoreAndLevel(points, highScore, llama.getPileSize(), fontSize, 40, 70);

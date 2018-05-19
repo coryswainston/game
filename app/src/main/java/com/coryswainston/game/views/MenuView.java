@@ -71,11 +71,11 @@ public class MenuView extends SurfaceView implements Runnable{
             drawingHelper.drawRectangle(0, bounds.y * 3 / 4 + llama.getHeight(), bounds.x, bounds.y, DrawingHelper.DARK_GREEN);
 
 
-            int width = llama.getWidth() / 12;
-            int shadowLeft = llama.getX() + width * (llama.facingRight() ? 1 : 2);
-            int shadowRight = llama.getX() + llama.getWidth() - width * (llama.facingRight() ? 2 : 1);
-            int shadowTop = llama.getFloor() + llama.getHeight() - width;
-            int shadowBottom = llama.getFloor() + llama.getHeight() + width;
+//            int width = llama.getWidth() / 12;
+//            int shadowLeft = llama.getX() + width * (llama.facingRight() ? 1 : 2);
+//            int shadowRight = llama.getX() + llama.getWidth() - width * (llama.facingRight() ? 2 : 1);
+//            int shadowTop = llama.getFloor() + llama.getHeight() - width;
+//            int shadowBottom = llama.getFloor() + llama.getHeight() + width;
 //            drawingHelper.drawOval(shadowLeft, shadowTop, shadowRight, shadowBottom, DrawingHelper.GREY);
 
             drawingHelper.draw(llama);
