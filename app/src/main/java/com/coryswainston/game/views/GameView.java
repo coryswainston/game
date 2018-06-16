@@ -70,6 +70,7 @@ public class GameView extends SurfaceView implements Runnable {
     private int framesSinceLastComet;
     private int sheepPerMinute;
     private int framesSinceLastSheep;
+    private int totalSheep;
 
     private List<String> instructions;
     private Iterator<String> instructionIt;
@@ -99,6 +100,7 @@ public class GameView extends SurfaceView implements Runnable {
         super(context);
         this.context = context;
         this.points = points;
+        totalSheep = 0;
 
         setUpBoundaries();
         createLlama();
@@ -318,7 +320,7 @@ public class GameView extends SurfaceView implements Runnable {
             ufo.setSize(bounds.x / 4, bounds.x / 8);
             ufo.setX(new Random().nextInt(bounds.x - ufo.getWidth()));
             ufo.setY(-ufo.getHeight());
-            ufo.setDy(20);
+            ufo.setDy(25);
             ufo.setDx(0);
             ufo.setFloor(yFloor);
         }
@@ -443,6 +445,14 @@ public class GameView extends SurfaceView implements Runnable {
                         sheep.burn();
                     }
                 }
+
+                if (ufo != null && ufo.getHitRect().contains(sheep.getHitRect())) {
+                    ufo.addSheep(sheep);
+                    if (!sheeps.remove(sheep)) {
+                        llama.getSheepPile().remove(sheep);
+                    }
+                    sheep.setX(ufo.getHitRect().centerX() - sheep.getWidth() / 2);
+                }
             }
             for (Spitball spitball : spitballs) {
                 if (spitball.getHitRect().intersect(comet.getHitRect())) {
@@ -462,17 +472,10 @@ public class GameView extends SurfaceView implements Runnable {
             if (llama.getHitRect().intersect(sheep.getHitRect()) && llama.isDucking()) {
                 it.remove();
                 llama.addToPile(sheep);
+                totalSheep += 1;
                 points += 100;
                 hoorahManager.makeHoorah(sheepCenter, HoorahManager.FontSize.SMALL, TIME_MED,
                         "+100");
-            }
-        }
-
-        if (ufo != null && llama.getPileSize() >= 10 && ufo.getHitRect().contains(llama.getHitRect())) {
-            ufo.getSheep().addAll(llama.getSheepPile());
-            llama.getSheepPile().removeAll(llama.getSheepPile());
-            for (Sheep sheep : ufo.getSheep()) {
-                sheep.setX(ufo.getHitRect().centerX() - sheep.getWidth() / 2);
             }
         }
     }
@@ -528,7 +531,7 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
 
         int fontSize = bounds.x / 20;
-        drawingHelper.drawScoreAndLevel(points, highScore, llama.getPileSize(), fontSize, 40, 70);
+        drawingHelper.drawScoreAndLevel(points, highScore, totalSheep, fontSize, 40, 70);
 
         if (instruction != null) {
             String[] lines = instruction.split("\n");

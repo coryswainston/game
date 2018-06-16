@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import com.coryswainston.game.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,11 +22,15 @@ public class Ufo extends Sprite implements Hittable {
     private static final int FRAMES = 5;
     private int floor;
     private int beamPos;
+    private int numSheeps;
+    private boolean leaving;
 
     public Ufo(Context context) {
         this.context = context;
         sheeps = new ArrayList<>();
         alive = true;
+        leaving = false;
+        numSheeps = 0;
 
         Resources res = context.getResources();
         drawables = new Drawable[2];
@@ -44,16 +49,35 @@ public class Ufo extends Sprite implements Hittable {
         }
 
         x += dx;
-        if (y <= 0) {
-            y += dy;
-            beamPos = getY() + height;
-        } else {
-            if (beamPos + dy < floor) {
-                beamPos += dy;
+
+        if (!leaving) {
+            if (y <= height) {
+                y += dy;
+                beamPos = getY() + height;
             } else {
-                beamPos = floor;
+                if (beamPos + dy < floor) {
+                    beamPos += dy;
+                } else {
+                    beamPos = floor;
+                }
+            }
+        } else {
+            if (beamPos > getY() + height) {
+                if (beamPos + dy > getY() + height) {
+                    beamPos += dy;
+                } else {
+                    beamPos = getY() + height;
+                }
+            } else {
+                if (y >= 0) {
+                    y += dy;
+                    beamPos = getY() + height;
+                } else {
+                    alive = false;
+                }
             }
         }
+
         if (!sheeps.isEmpty()) {
             for(Iterator<Sheep> it = sheeps.iterator(); it.hasNext();) {
                 Sheep sheep = it.next();
@@ -62,8 +86,8 @@ public class Ufo extends Sprite implements Hittable {
                     it.remove();
                 }
             }
-            if (sheeps.isEmpty()) {
-                alive = false;
+            if (numSheeps >= 10) {
+                leave();
             }
         }
     }
@@ -73,14 +97,20 @@ public class Ufo extends Sprite implements Hittable {
         return drawables[drawableIdx];
     }
 
-//    @Override
-//    public void kill() {
-//        dy = -dy;
-//        floor = height;
-//    }
+    private void leave() {
+        if (!leaving) {
+            leaving = true;
+            dy = -dy;
+        }
+    }
 
     public List<Sheep> getSheep() {
-        return sheeps;
+        return Collections.unmodifiableList(sheeps);
+    }
+
+    public void addSheep(Sheep sheep) {
+        sheeps.add(sheep);
+        numSheeps++;
     }
 
     public void setFloor(int floor) {
