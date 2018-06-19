@@ -446,7 +446,7 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 }
 
-                if (ufo != null && ufo.getHitRect().contains(sheep.getHitRect())) {
+                if (ufo != null && ufo.beamContains(sheep)) {
                     ufo.addSheep(sheep);
                     if (!sheeps.remove(sheep)) {
                         llama.getSheepPile().remove(sheep);
@@ -490,8 +490,8 @@ public class GameView extends SurfaceView implements Runnable {
                 sheep.setDx(-sheep.getDx());
             }
         }
-        if (llama.getX() > bounds.x - llama.getWidth() && llama.facingRight() ||
-                llama.getX() < 0 && !llama.facingRight()){
+        if (llama.getX() > bounds.x - llama.getWidth() && llama.getDx() > 0 ||
+                llama.getX() < 0 && llama.getDx() < 0) {
             llama.setDx(0);
         }
     }

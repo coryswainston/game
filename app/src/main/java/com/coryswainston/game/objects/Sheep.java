@@ -56,7 +56,7 @@ public class Sheep extends Sprite implements Hittable {
 
     @Override
     public Rect getHitRect() {
-        return new Rect(getX() + width / 10, getY(), getX() + width * 9 / 10, getY() + height);
+        return new Rect(getX() + width / 10, getY() + width / 10, getX() + width * 9 / 10, getY() + height);
     }
 
     public void turnLeft() {

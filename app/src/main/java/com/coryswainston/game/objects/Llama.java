@@ -54,6 +54,7 @@ public class Llama extends Sprite implements Hittable {
 
         for (int i = 0; i < sheepPile.size(); i++) {
             Sheep sheep = sheepPile.get(i);
+            sheep.setDx(dx); // just to make the field accurate
             int sheepHeight = (int)Math.round(sheep.getHeight() * .8);
             sheep.setX(drawableIdx % 2 == 0 ? x : x + width / 5);
             final int sheepVelocity = 40;
@@ -126,12 +127,14 @@ public class Llama extends Sprite implements Hittable {
     public void turnLeft(){
         if (facingRight()) {
             drawableIdx++;
+            setX(getX() + -width / 8);
         }
     }
 
     public void turnRight() {
         if (!facingRight()) {
             drawableIdx--;
+            setX(getX() + width / 8);
         }
     }
 

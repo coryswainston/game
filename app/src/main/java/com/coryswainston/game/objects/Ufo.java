@@ -121,4 +121,18 @@ public class Ufo extends Sprite implements Hittable {
     public Rect getHitRect() {
         return new Rect(getX() + width / 5, getY() + height, getX() + width * 4  / 5, beamPos);
     }
+
+    public boolean beamContains(Sprite s) {
+        Rect beam = getHitRect();
+        Rect r = ((Hittable)s).getHitRect();
+        float dx = s.getDx();
+
+        int left = Math.max(r.left, r.left + (int)dx);
+        int right = Math.min(r.right, r.right + (int)dx);
+
+        return beam.top <= r.top
+                && beam.bottom >= r.bottom
+                && beam.right >= right
+                && beam.left <= left;
+    }
 }
