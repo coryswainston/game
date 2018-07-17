@@ -10,10 +10,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.view.SurfaceHolder;
 
-import com.coryswainston.game.objects.Sprite;
+import com.coryswainston.game.sprites.Sprite;
 
 import java.util.Collection;
 

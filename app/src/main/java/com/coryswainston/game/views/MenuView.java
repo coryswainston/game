@@ -13,7 +13,7 @@ import android.view.SurfaceView;
 import com.coryswainston.game.R;
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.ViewListener;
-import com.coryswainston.game.objects.Llama;
+import com.coryswainston.game.sprites.Llama;
 
 /**
  * The opening menu of the game

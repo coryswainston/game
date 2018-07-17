@@ -1,4 +1,4 @@
-package com.coryswainston.game.objects;
+package com.coryswainston.game.sprites;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

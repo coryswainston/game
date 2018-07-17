@@ -1,12 +1,12 @@
-package com.coryswainston.game.objects;
+package com.coryswainston.game.sprites;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import com.coryswainston.game.R;
+import com.coryswainston.game.objects.Hittable;
 
 import java.util.ArrayList;
 import java.util.Collections;
