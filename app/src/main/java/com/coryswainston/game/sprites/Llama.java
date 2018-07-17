@@ -66,6 +66,7 @@ public class Llama extends Sprite implements Hittable {
                 } else {
                     sheep.setY(targetY);
                     sheep.setSeated(true);
+                    sheep.setDy(0);
                 }
             }
         }
@@ -106,6 +107,8 @@ public class Llama extends Sprite implements Hittable {
     }
 
     public void addToPile(Sheep sheep) {
+        sheep.setSeated(false);
+        sheep.setDy(40);
         sheepPile.add(sheep);
     }
 

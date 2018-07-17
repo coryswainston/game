@@ -10,8 +10,11 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.coryswainston.game.R;
 import com.coryswainston.game.sprites.Sprite;
 
 import java.util.Collection;
@@ -183,22 +186,33 @@ public class DrawingHelper {
     }
 
     /**
-     * Draws the score and level.
+     * Draws the score and number of lives
      *
      * @param points to be drawn.
-     * @param level to be drawn.
-     * @param fontSize of the score.
+     * @param high score to be drawn.
+     * @param lives the number of sheep to be drawn.
+     * @param fontSize of text.
      * @param x coordinate.
      * @param y coordinate.
      */
-    public void drawScoreAndLevel(int points, int high, int level, int fontSize, int x, int y) {
+    public void drawScore(int points, int high, int lives, Drawable icon, int fontSize, int x, int y) {
         paint.setColor(BLACK);
         paint.setTextSize(fontSize);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(VALERA);
-        canvas.drawText("SCORE: " + points + "  SHEEP: " + level, x, y, paint);
+        canvas.drawText("SCORE: " + points, x, y, paint);
         paint.setColor(DARK_GREEN);
         canvas.drawText("HIGH: " + high, x, y + fontSize * 1.2f, paint);
+
+        int sheepWidth = fontSize * 10 / 7;
+        int sheepY = y + fontSize * 2;
+        for (int i = 0; i < lives; i++) {
+            Rect bounds = new Rect(x, sheepY, x + sheepWidth, sheepY + fontSize);
+            bounds.left += sheepWidth * i;
+            bounds.right += sheepWidth * i;
+            icon.setBounds(bounds);
+            icon.draw(canvas);
+        }
     }
 
     /**

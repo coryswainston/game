@@ -34,7 +34,7 @@ public class Sheep extends Sprite implements Hittable {
         drawableIdx = 0;
         alive = true;
         burnt = false;
-        seated = false;
+        seated = true;
         stepTimer = 0;
     }
 
@@ -44,7 +44,7 @@ public class Sheep extends Sprite implements Hittable {
     }
 
     @Override
-    public void update(){
+    public void update() {
         x += dx;
         y += dy;
 
@@ -58,6 +58,10 @@ public class Sheep extends Sprite implements Hittable {
     @Override
     public Rect getHitRect() {
         return new Rect(getX() + width / 10, getY() + width / 10, getX() + width * 9 / 10, getY() + height);
+    }
+
+    public boolean facingRight() {
+        return drawableIdx <= 1;
     }
 
     public void turnLeft() {

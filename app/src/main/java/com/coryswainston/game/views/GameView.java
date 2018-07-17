@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -14,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.coryswainston.game.GameConditions;
+import com.coryswainston.game.R;
 import com.coryswainston.game.helpers.DrawingHelper;
 import com.coryswainston.game.helpers.GestureHelper;
 import com.coryswainston.game.helpers.HoorahManager;
@@ -53,6 +55,7 @@ public class GameView extends SurfaceView implements Runnable {
     private Point bounds;
     private int yFloor;
     private HoorahManager hoorahManager;
+    private final Drawable SHEEP_IMAGE;
 
     private Context context;
     private ViewListener finishListener;
@@ -66,10 +69,6 @@ public class GameView extends SurfaceView implements Runnable {
     private List<Comet> comets = new ArrayList<>();
     private List<Sheep> sheeps = new ArrayList<>();
     private List<Cloud> clouds = new ArrayList<>(3);
-
-    private List<String> instructions;
-    private Iterator<String> instructionIt;
-    private String instruction;
 
     /**
      * Standard View constructor.
@@ -98,17 +97,10 @@ public class GameView extends SurfaceView implements Runnable {
         spriteFactory = new SpriteFactory(bounds, yFloor, context);
         llama = spriteFactory.buildLlama();
         clouds = spriteFactory.buildClouds();
+        SHEEP_IMAGE = context.getResources().getDrawable(R.drawable.sheep1);
 
         sharedPreferences = context.getSharedPreferences(LLAMA_PREFS, Context.MODE_PRIVATE);
         gc.setHighScore(sharedPreferences.getInt(HIGH_SCORE, 0));
-
-        instructions = new ArrayList<>();
-        instructions.add("Swipe left or right to \nskate across the screen.");
-        instructions.add("Swipe down to pick up \nsheep.");
-        instructions.add("Swipe up to jump.");
-        instructions.add("Swipe and hold in any \ndirection to spit.");
-        instructionIt = instructions.iterator();
-        instruction = instructionIt.next();
     }
 
     private void setUpBoundaries() {
@@ -189,12 +181,6 @@ public class GameView extends SurfaceView implements Runnable {
                 gestureHelper.up(e);
                 return true;
             case MotionEvent.ACTION_UP: // when finger releases
-                if (instructionIt.hasNext()) {
-                    instruction = instructionIt.next();
-                } else {
-                    instruction = null;
-                }
-
                 if(!playing) {
                     if (llama.isAlive() && !gc.isGameWon()) {
                         resume();
@@ -254,6 +240,11 @@ public class GameView extends SurfaceView implements Runnable {
         updateUfo();
         updateHighScore();
         gc.passFrame();
+
+        if (gc.getLives() == 0) {
+            gc.setGameLost(true);
+            playing = false;
+        }
     }
 
     private void updateHighScore() {
@@ -267,7 +258,7 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void updateUfo() {
-        if (llama.getPileSize() >= 10 && ufo == null) {
+        if (llama.getPileSize() >= 7 && ufo == null) {
             Log.d("GameView", "Creating UFO");
             ufo = spriteFactory.buildUfo();
         }
@@ -308,21 +299,46 @@ public class GameView extends SurfaceView implements Runnable {
         int odds = (int) (1 / sheepPerFrame);
         Random random = new Random();
         if (random.nextInt(odds) == 1 && gc.getFramesSinceLastSheep() > 30) {
-            gc.setFramesSinceLastSheep(0);
+            gc.resetFramesSinceLastSheep();
             sheeps.add(spriteFactory.buildSheep());
         }
 
-        for (Sheep sheep : sheeps) {
+        for (Iterator<Sheep> it = llama.getSheepPile().iterator(); it.hasNext();) {
+            Sheep sheep = it.next();
+            if (!sheep.isSeated() && sheep.getDy() == 0 || !sheep.isAlive()) {
+                sheeps.add(sheep);
+                it.remove();
+            }
+        }
+
+        for (Iterator<Sheep> it = sheeps.iterator(); it.hasNext();) {
+            Sheep sheep = it.next();
+            if (!sheep.isSeated()) {
+                sheep.setDy(30);
+                sheep.setDx(0);
+            }
             sheep.update();
+            if (sheep.getY() >= yFloor - sheep.getHeight()) {
+                if (sheep.isAlive()) {
+                    sheep.setY(yFloor - sheep.getHeight());
+                    sheep.setSeated(true);
+                    sheep.setDy(0);
+                    sheep.setDx(sheep.facingRight() ? 5 : -5);
+                }
+            }
+            if (!sheep.isAlive() && sheep.getY() > bounds.y) {
+                it.remove();
+            }
         }
     }
 
     private void updateComets() {
         float cometsPerFrame = gc.getCometsPerMinute() / 60.0f / 30.0f;
         int odds = (int) (1 / cometsPerFrame);
+        Log.d("ODDS", "odds are " + odds);
         Random random = new Random();
-        if ((random.nextInt(odds) == 1 || gc.getFramesSinceLastComet() == odds * 2) && comets.size() < Math.max(llama.getPileSize(), 2)) {
-            gc.setFramesSinceLastComet(0);
+        if ((random.nextInt(odds) == 1 || gc.getFramesSinceLastComet() == odds) && comets.size() < 5) {
+            gc.resetFramesSinceLastComet();
             comets.add(spriteFactory.buildComet());
         }
 
@@ -342,19 +358,26 @@ public class GameView extends SurfaceView implements Runnable {
         List<Sheep> allSheeps = new ArrayList<>();
         allSheeps.addAll(sheeps);
         allSheeps.addAll(llama.getSheepPile());
-        for (Sheep sheep : allSheeps) {
+        for(Sheep sheep : allSheeps) {
             for (Comet comet : comets) {
                 if (Collisions.intersect(sheep, comet)) {
-                    comet.explode();
-                    if (!sheep.isBurnt()) {
-                        gc.subtractPoints(50);
-                        hoorahManager.makeHoorah(new Point(comet.getX(), comet.getY()),
-                                HoorahManager.FontSize.SMALL,
-                                TIME_MED,
-                                "-50");
-                        sheep.burn();
-                    } else {
-                        sheep.kill();
+                    if (!comet.isExploded()) {
+                        comet.explode();
+                        sheep.setSeated(false);
+                        if (!sheep.isBurnt()) {
+                            gc.subtractPoints(50);
+                            hoorahManager.makeHoorah(new Point(comet.getX(), comet.getY()),
+                                    HoorahManager.FontSize.SMALL,
+                                    TIME_MED,
+                                    "-50");
+                            sheep.burn();
+                        } else {
+                            sheep.kill();
+                            sheep.setRotation(180);
+                            sheep.setX(sheep.getX() + sheep.getWidth());
+                            sheep.setY(sheep.getY() + sheep.getHeight() / 2);
+                            gc.loseLife();
+                        }
                     }
                 }
             }
@@ -370,6 +393,7 @@ public class GameView extends SurfaceView implements Runnable {
         for (Comet comet: comets) {
             if (Collisions.intersect(comet, llama)) {
                 comet.explode();
+                gc.setGameLost(true);
                 playing = false;
                 llama.kill();
             }
@@ -392,7 +416,6 @@ public class GameView extends SurfaceView implements Runnable {
             if (Collisions.intersect(llama, sheep) && llama.isDucking()) {
                 it.remove();
                 llama.addToPile(sheep);
-                gc.setTotalSheep(gc.getTotalSheep() + 1);
                 gc.addPoints(100);
                 hoorahManager.makeHoorah(sheepCenter, HoorahManager.FontSize.SMALL, TIME_MED,
                         "+100");
@@ -451,26 +474,21 @@ public class GameView extends SurfaceView implements Runnable {
         drawingHelper.drawRectangle(bounds.x - 40, 20, bounds.x - 25, 70, DrawingHelper.BLACK);
 
         int fontSize = bounds.x / 20;
-        drawingHelper.drawScoreAndLevel(gc.getPoints(),
+        drawingHelper.drawScore(gc.getPoints(),
                 gc.getHighScore(),
-                gc.getTotalSheep(),
+                gc.getLives(),
+                SHEEP_IMAGE,
                 fontSize, 40, 70);
 
-        if (instruction != null) {
-            String[] lines = instruction.split("\n");
-            for (int i = 0; i < lines.length; i++) {
-                drawingHelper.drawCenterText(lines[i], fontSize, bounds.x / 2,
-                        yFloor + fontSize * 2 + fontSize * i, DrawingHelper.WHITE);
-            }
-        }
-
-        if (!playing){
+        if (!playing) {
             drawingHelper.throwShade();
             int xTextPosition = bounds.x / 2;
             int yTextPosition = (int) (bounds.y / 2.5);
             fontSize = bounds.x / 6;
-            String messageText = "GAME OVER";
-            if (llama.isAlive()) {
+            String messageText;
+            if (gc.isGameLost()) {
+                messageText = "GAME OVER";
+            } else {
                 messageText = gc.isGameWon() ? "YOU WIN!" : "PAUSED";
             }
             drawingHelper.drawCenterText(messageText, fontSize, xTextPosition, yTextPosition,
@@ -487,7 +505,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void controlFrameRate(long frameTime){
         long leftoverMillis = TARGET_MILLIS - frameTime;
-//        Log.d("GAME VIEW", "Leftover Millis: " + leftoverMillis);
+        Log.d("GAME VIEW", "Leftover Millis: " + leftoverMillis);
         if (leftoverMillis < 5){
             leftoverMillis = 5;
         }

@@ -9,25 +9,36 @@ public class GameConditions {
 
     private int points;
     private int highScore;
-    private int totalSheep;
+    private int lives;
     private int cometsPerMinute;
     private int framesSinceLastComet;
     private int sheepPerMinute;
     private int framesSinceLastSheep;
     private boolean newHigh;
     private boolean gameWon;
+    private boolean gameLost;
+
 
     // Initializes to starting defaults
     public GameConditions() {
         points = 0;
         highScore = 0;
-        totalSheep = 0;
+        lives = 3;
         cometsPerMinute = BASE_PER_MINUTE;
         framesSinceLastComet = 0;
         sheepPerMinute = BASE_PER_MINUTE * 2;
         framesSinceLastSheep = 0;
         newHigh = false;
         gameWon = false;
+        gameLost = false;
+    }
+
+    public boolean isGameLost() {
+        return gameLost;
+    }
+
+    public void setGameLost(boolean gameLost) {
+        this.gameLost = gameLost;
     }
 
     public int getCometsPerMinute() {
@@ -42,8 +53,8 @@ public class GameConditions {
         return framesSinceLastComet;
     }
 
-    public void setFramesSinceLastComet(int framesSinceLastComet) {
-        this.framesSinceLastComet = framesSinceLastComet;
+    public void resetFramesSinceLastComet() {
+        framesSinceLastComet = 0;
     }
 
     public int getSheepPerMinute() {
@@ -58,16 +69,8 @@ public class GameConditions {
         return framesSinceLastSheep;
     }
 
-    public void setFramesSinceLastSheep(int framesSinceLastSheep) {
-        this.framesSinceLastSheep = framesSinceLastSheep;
-    }
-
-    public int getTotalSheep() {
-        return totalSheep;
-    }
-
-    public void setTotalSheep(int totalSheep) {
-        this.totalSheep = totalSheep;
+    public void resetFramesSinceLastSheep() {
+        framesSinceLastSheep = 0;
     }
 
     public int getPoints() {
@@ -113,5 +116,13 @@ public class GameConditions {
     public void passFrame() {
         framesSinceLastComet++;
         framesSinceLastSheep++;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void loseLife() {
+        lives--;
     }
 }

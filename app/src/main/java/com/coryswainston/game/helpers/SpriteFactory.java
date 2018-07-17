@@ -91,15 +91,15 @@ public class SpriteFactory {
         for (int i = 0; i < 3; i++) {
             Cloud cloud = new Cloud(context);
             cloud.setSize(bounds.x / 6, bounds.x / 8);
-            cloud.setDx((float) (.5 - 0.1 * i));
+            cloud.setDx((float) (.4));
             clouds.add(i, cloud);
         }
         clouds.get(0).setX(bounds.x / 2);
         clouds.get(1).setX(bounds.x * 7 / 8);
         clouds.get(2).setX(bounds.x / 6);
-        clouds.get(0).setY(bounds.y / 2);
-        clouds.get(1).setY(bounds.y / 4);
-        clouds.get(2).setY(0);
+        clouds.get(0).setY(bounds.y * 3 / 5);
+        clouds.get(1).setY(bounds.y * 2 / 5);
+        clouds.get(2).setY(bounds.y / 5);
 
         return clouds;
     }

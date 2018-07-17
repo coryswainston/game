@@ -87,7 +87,7 @@ public class Ufo extends Sprite implements Hittable {
                     it.remove();
                 }
             }
-            if (numSheeps >= 10) {
+            if (numSheeps >= 7) {
                 leave();
             }
         }
