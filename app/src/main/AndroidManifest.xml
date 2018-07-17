@@ -22,6 +22,10 @@
         <activity android:name=".activities.GameActivity"
             android:screenOrientation="sensorPortrait"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name=".activities.TutorialActivity"
+            android:noHistory="true"
+            android:screenOrientation="sensorPortrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>

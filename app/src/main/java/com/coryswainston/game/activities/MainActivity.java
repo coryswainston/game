@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.coryswainston.game.helpers.ViewListener;
 import com.coryswainston.game.views.MenuView;
+import com.coryswainston.game.views.TutorialView;
 
 import static com.coryswainston.game.Game.LEVEL;
 import static com.coryswainston.game.Game.SCORE;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startLevel(Intent data) {
         Log.d("MainActivity", "Starting new level.");
-        Intent intent = new Intent(this, GameActivity.class);
+        Intent intent = new Intent(this, TutorialActivity.class);
         intent.putExtra(SCORE, data.getIntExtra(SCORE, 0));
         intent.putExtra(LEVEL, ++level);
         startActivityForResult(intent, 1);

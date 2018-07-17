@@ -109,6 +109,11 @@ public class DrawingHelper {
         }
     }
 
+    public void draw(Drawable d, Rect bounds) {
+        d.setBounds(bounds);
+        d.draw(canvas);
+    }
+
     /**
      * Draws a collection o Sprites.
      *
@@ -156,6 +161,11 @@ public class DrawingHelper {
     public void drawRectangle(int left, int top, int right, int bottom, int color) {
         paint.setColor(color);
         canvas.drawRect(left, top, right, bottom, paint);
+    }
+
+    public void drawRoundedRect(Rect r, int color, int radius) {
+        paint.setColor(color);
+        canvas.drawRoundRect(new RectF(r), radius, radius, paint);
     }
 
     /**
