@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.coryswainston.game.R;
 
@@ -122,17 +123,17 @@ public class Ufo extends Sprite implements Hittable {
         return new Rect(getX() + width / 5, getY() + height, getX() + width * 4  / 5, beamPos);
     }
 
-    public boolean beamContains(Sprite s) {
+    public boolean beamContains(Sheep s) {
         Rect beam = getHitRect();
-        Rect r = ((Hittable)s).getHitRect();
+        Rect r = s.getHitRect();
         float dx = s.getDx();
 
-        int left = Math.max(r.left, r.left + (int)dx);
-        int right = Math.min(r.right, r.right + (int)dx);
+        int left = Math.min(beam.left, beam.left + (int)dx);
+        int right = Math.max(beam.right, beam.right + (int)dx);
 
         return beam.top <= r.top
                 && beam.bottom >= r.bottom
-                && beam.right >= right
-                && beam.left <= left;
+                && right >= r.right
+                && left <= r.left;
     }
 }

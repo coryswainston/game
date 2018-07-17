@@ -313,7 +313,7 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void updateUfo() {
-        if (llama.getPileSize() >= 10 && ufo == null) {
+        if (llama.getPileSize() >= 1 && ufo == null) {
             Log.d("GameView", "Creating UFO");
             ufo = new Ufo(context);
 
@@ -424,16 +424,11 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void detectCollisions() {
-        for(Comet comet : comets){
-            if (comet.getHitRect().intersect(llama.getHitRect())) {
-                comet.explode();
-                playing = false;
-                llama.kill();
-            }
-            List<Sheep> allSheeps = new ArrayList<>();
-            allSheeps.addAll(sheeps);
-            allSheeps.addAll(llama.getSheepPile());
-            for (Sheep sheep : allSheeps) {
+        List<Sheep> allSheeps = new ArrayList<>();
+        allSheeps.addAll(sheeps);
+        allSheeps.addAll(llama.getSheepPile());
+        for (Sheep sheep : allSheeps) {
+            for (Comet comet : comets) {
                 if (sheep.getHitRect().intersect(comet.getHitRect())) {
                     comet.explode();
                     if (!sheep.isBurnt()) {
@@ -443,17 +438,27 @@ public class GameView extends SurfaceView implements Runnable {
                                 TIME_MED,
                                 "-50");
                         sheep.burn();
+                    } else {
+                        sheep.kill();
                     }
-                }
-
-                if (ufo != null && ufo.beamContains(sheep)) {
-                    ufo.addSheep(sheep);
-                    if (!sheeps.remove(sheep)) {
-                        llama.getSheepPile().remove(sheep);
-                    }
-                    sheep.setX(ufo.getHitRect().centerX() - sheep.getWidth() / 2);
                 }
             }
+            if (ufo != null && ufo.beamContains(sheep)) {
+                ufo.addSheep(sheep);
+                if (!sheeps.remove(sheep)) {
+                    llama.getSheepPile().remove(sheep);
+                }
+                sheep.setX(ufo.getHitRect().centerX() - sheep.getWidth() / 2);
+            }
+        }
+
+        for (Comet comet: comets) {
+            if (comet.getHitRect().intersect(llama.getHitRect())) {
+                comet.explode();
+                playing = false;
+                llama.kill();
+            }
+
             for (Spitball spitball : spitballs) {
                 if (spitball.getHitRect().intersect(comet.getHitRect())) {
                     comet.explode();
