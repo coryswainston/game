@@ -88,7 +88,7 @@ public class TutorialView extends SurfaceView implements Runnable {
         spriteFactory = new SpriteFactory(bounds, yFloor, context);
         llama = spriteFactory.buildLlama();
         clouds = spriteFactory.buildClouds();
-        LLAMA_FACE = context.getResources().getDrawable(R.drawable.llama_face);
+        LLAMA_FACE = context.getResources().getDrawable(R.drawable.llama1);
 
         instructions = new ArrayList<>();
         instructions.add("Swipe left or right to \nskate across the screen.");

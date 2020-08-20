@@ -43,7 +43,7 @@ public class MenuView extends SurfaceView implements Runnable{
         flashAlpha = 255;
         flashSwitch = false;
 
-        background = BitmapFactory.decodeResource(getResources(), R.drawable.menu_background);
+        background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
         background = Bitmap.createScaledBitmap(background, bounds.y * 4 / 3, bounds.y, false);
 
         llama = new Llama(context, bounds.x / 6);

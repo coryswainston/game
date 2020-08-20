@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\swain\Documents\GitHub\game\Game\app\app.iml" filepath="C:\Users\swain\Documents\GitHub\game\Game\app\app.iml" />
+      <module fileurl="file://C:/Users/swain/Documents/GitHub/game/Game/app/app.iml" filepath="C:/Users/swain/Documents/GitHub/game/Game/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/game.iml" filepath="$PROJECT_DIR$/game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/llama-lland.iml" filepath="$PROJECT_DIR$/.idea/modules/llama-lland.iml" group="llama-lland" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/llama-lland-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/llama-lland-app.iml" group="llama-lland/app" />
     </modules>
   </component>
 </project>
